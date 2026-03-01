@@ -1,658 +1,1653 @@
 <!DOCTYPE html>
-<html lang="en"><head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>AI Intelligence Brief - Week 8</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-<style>
-*{margin:0;padding:0;box-sizing:border-box;}
-:root{
-  --bg:#050510;--surface:rgba(255,255,255,0.03);--glass:rgba(255,255,255,0.05);
-  --border:rgba(255,255,255,0.07);--text:#f0f0f5;--muted:#a0a0b8;--dim:#52526e;
-  --accent:#3b82f6;--purple:#8b5cf6;--cyan:#06b6d4;--green:#10b981;
-  --amber:#f59e0b;--red:#ef4444;
-}
-html{scroll-behavior:smooth;}
-body{background:var(--bg);color:var(--text);font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;-webkit-font-smoothing:antialiased;line-height:1.6;overflow-x:hidden;}
+<html lang="en">
 
-/* READING PROGRESS BAR */
-#reading-progress{position:fixed;top:0;left:0;height:3px;width:0;background:linear-gradient(90deg,#3b82f6,#8b5cf6,#06b6d4);z-index:9999;transition:width 0.1s linear;border-radius:0 2px 2px 0;}
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>AI Intelligence Brief - Week 8</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,500;0,8..60,600;0,8..60,700;1,8..60,400;1,8..60,500&family=JetBrains+Mono:wght@400;500;600&display=swap"
+    rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
 
-/* SCROLL REVEAL */
-.reveal{opacity:0;transform:translateY(50px);transition:opacity 0.9s cubic-bezier(0.16,1,0.3,1),transform 0.9s cubic-bezier(0.16,1,0.3,1);}
-.reveal.visible{opacity:1;transform:translateY(0);}
-.reveal-delay-1{transition-delay:0.15s;}
-.reveal-delay-2{transition-delay:0.3s;}
-.reveal-delay-3{transition-delay:0.45s;}
+    :root {
+      --bg: #050608;
+      --surface: #0A0C12;
+      --surface-2: #10131B;
+      --surface-3: #161A26;
+      --border: rgba(255, 255, 255, 0.06);
+      --border-hover: rgba(255, 255, 255, 0.12);
+      --text: #F0F2F8;
+      --text-secondary: #C8CDD8;
+      --body: #9BA3B8;
+      --muted: #5E667A;
+      --dim: #353B4D;
+      --accent: #6C6FFF;
+      --accent-light: #8B8EFF;
+      --accent-glow: rgba(108, 111, 255, 0.15);
+      --cyan: #06D6A0;
+      --cyan-glow: rgba(6, 214, 160, 0.12);
+      --amber: #FFB84D;
+      --amber-glow: rgba(255, 184, 77, 0.12);
+      --emerald: #34D399;
+      --emerald-glow: rgba(52, 211, 153, 0.12);
+      --rose: #FF6B8A;
+      --rose-glow: rgba(255, 107, 138, 0.12);
+      --purple: #A78BFA;
+      --purple-glow: rgba(167, 139, 250, 0.12);
+      --radius-sm: 8px;
+      --radius-md: 14px;
+      --radius-lg: 20px;
+      --radius-xl: 28px;
+      --space-xs: 8px;
+      --space-sm: 16px;
+      --space-md: 24px;
+      --space-lg: 40px;
+      --space-xl: 64px;
+      --space-2xl: 100px;
+    }
 
-/* LAYOUT */
-.container{max-width:780px;margin:0 auto;padding:0 24px;}
-.container-wide{max-width:1000px;margin:0 auto;padding:0 24px;}
+    html {
+      scroll-behavior: smooth;
+    }
 
-/* =========== HERO =========== */
-.hero{min-height:100vh;display:flex;align-items:center;justify-content:center;text-align:center;position:relative;overflow:hidden;}
-#particle-canvas{position:absolute;inset:0;z-index:0;}
-.hero-glow{position:absolute;top:50%;left:50%;width:500px;height:500px;transform:translate(-50%,-50%);border-radius:50%;background:radial-gradient(circle,rgba(59,130,246,0.12) 0%,rgba(139,92,246,0.06) 40%,transparent 70%);animation:glow-pulse 4s ease-in-out infinite;z-index:0;}
-@keyframes glow-pulse{0%,100%{transform:translate(-50%,-50%) scale(1);opacity:0.7;}50%{transform:translate(-50%,-50%) scale(1.15);opacity:1;}}
-.hero-content{position:relative;z-index:2;}
-.hero-label{font-size:12px;font-weight:700;color:var(--purple);letter-spacing:3px;text-transform:uppercase;}
-.hero h1{font-size:clamp(42px,8vw,80px);font-weight:900;letter-spacing:-3px;line-height:0.95;margin:24px 0;background:linear-gradient(135deg,#ffffff 0%,#c4b5fd 30%,#93c5fd 60%,#ffffff 100%);background-size:300% 300%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:hero-gradient 8s ease infinite;}
-@keyframes hero-gradient{0%,100%{background-position:0% 50%;}50%{background-position:100% 50%;}}
-.hero-sub{font-size:17px;color:var(--muted);max-width:520px;margin:0 auto;line-height:1.75;}
-.hero-meta{margin-top:36px;font-size:12px;color:var(--dim);letter-spacing:1.2px;}
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Sora', system-ui, -apple-system, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
 
-/* SCROLL INDICATOR */
-.scroll-hint{position:absolute;bottom:36px;left:50%;transform:translateX(-50%);animation:bounce-hint 2.5s ease-in-out infinite;z-index:2;}
-@keyframes bounce-hint{0%,100%{transform:translateX(-50%) translateY(0);opacity:0.5;}50%{transform:translateX(-50%) translateY(10px);opacity:1;}}
+    /* NOISE TEXTURE OVERLAY */
+    body::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      pointer-events: none;
+      opacity: 0.022;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      background-repeat: repeat;
+      background-size: 256px;
+    }
 
-/* =========== STAT CARDS =========== */
-.stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin:70px 0 90px 0;}
-.stat-card{background:var(--glass);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1px solid var(--border);border-radius:16px;padding:28px;text-align:center;transition:border-color 0.4s,transform 0.4s,box-shadow 0.4s;}
-.stat-card:hover{border-color:rgba(59,130,246,0.3);transform:translateY(-4px);box-shadow:0 16px 40px rgba(59,130,246,0.08);}
-.stat-number{font-size:42px;font-weight:900;letter-spacing:-1px;font-variant-numeric:tabular-nums;}
-.stat-label{font-size:11px;font-weight:600;color:var(--dim);text-transform:uppercase;letter-spacing:1.2px;margin-top:6px;}
-.c-blue{color:var(--accent);}
-.c-green{color:var(--green);}
-.c-amber{color:var(--amber);}
+    /* GRADIENT MESH AMBIENT */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      pointer-events: none;
+      background:
+        radial-gradient(ellipse 80% 50% at 20% 20%, rgba(108, 111, 255, 0.06), transparent),
+        radial-gradient(ellipse 60% 40% at 80% 80%, rgba(167, 139, 250, 0.04), transparent),
+        radial-gradient(ellipse 50% 60% at 50% 50%, rgba(6, 214, 160, 0.02), transparent);
+      animation: meshDrift 20s ease-in-out infinite alternate;
+    }
 
-/* =========== EXECUTIVE SUMMARY =========== */
-.exec-bar{background:var(--glass);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:1px solid var(--border);border-radius:16px;padding:40px;margin:0 0 40px 0;position:relative;overflow:hidden;}
-.exec-bar::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--accent),var(--purple),var(--cyan),var(--green));}
-.exec-bar p.exec-label{font-size:10px;font-weight:800;color:var(--accent);text-transform:uppercase;letter-spacing:2px;margin-bottom:14px;}
-.exec-bar p.exec-body{font-size:16px;color:#d0d0e0;line-height:1.85;}
+    @keyframes meshDrift {
+      0% {
+        opacity: 1;
+      }
 
-/* =========== GRADIENT DIVIDER =========== */
-.grad-divider{height:1px;margin:0 auto;max-width:70%;}
-.gd-blue{background:linear-gradient(90deg,transparent,rgba(59,130,246,0.35),rgba(139,92,246,0.35),transparent);}
-.gd-green{background:linear-gradient(90deg,transparent,rgba(16,185,129,0.35),rgba(6,182,212,0.35),transparent);}
-.gd-amber{background:linear-gradient(90deg,transparent,rgba(245,158,11,0.35),rgba(239,68,68,0.35),transparent);}
-.gd-purple{background:linear-gradient(90deg,transparent,rgba(139,92,246,0.35),rgba(59,130,246,0.35),transparent);}
-.gd-red{background:linear-gradient(90deg,transparent,rgba(239,68,68,0.35),rgba(245,158,11,0.35),transparent);}
-.gd-cyan{background:linear-gradient(90deg,transparent,rgba(6,182,212,0.35),rgba(16,185,129,0.35),transparent);}
+      50% {
+        opacity: 0.7;
+      }
 
-/* =========== SECTIONS =========== */
-section{padding:100px 0 110px 0;position:relative;}
-.section-icon{width:56px;height:56px;border-radius:14px;display:flex;align-items:center;justify-content:center;margin-bottom:18px;position:relative;}
-.section-icon svg{width:26px;height:26px;position:relative;z-index:1;}
-.section-icon::after{content:'';position:absolute;inset:-4px;border-radius:18px;opacity:0;transition:opacity 0.6s;}
-.section-icon:hover::after{opacity:1;}
-.icon-amber{background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.18);}
-.icon-amber::after{border:1px solid rgba(245,158,11,0.35);}
-.icon-green{background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.18);}
-.icon-green::after{border:1px solid rgba(16,185,129,0.35);}
-.icon-blue{background:rgba(59,130,246,0.08);border:1px solid rgba(59,130,246,0.18);}
-.icon-blue::after{border:1px solid rgba(59,130,246,0.35);}
-.icon-red{background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.18);}
-.icon-red::after{border:1px solid rgba(239,68,68,0.35);}
-.icon-purple{background:rgba(139,92,246,0.08);border:1px solid rgba(139,92,246,0.18);}
-.icon-purple::after{border:1px solid rgba(139,92,246,0.35);}
-
-.section-num{font-size:12px;font-weight:800;letter-spacing:2.5px;text-transform:uppercase;margin-bottom:8px;}
-.sn-amber{background:linear-gradient(90deg,#f59e0b,#fbbf24);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
-.sn-green{background:linear-gradient(90deg,#10b981,#34d399);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
-.sn-blue{background:linear-gradient(90deg,#3b82f6,#60a5fa);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
-.sn-red{background:linear-gradient(90deg,#ef4444,#f87171);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
-.sn-purple{background:linear-gradient(90deg,#8b5cf6,#a78bfa);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
-
-.section-head{font-size:clamp(28px,4.5vw,44px);font-weight:800;letter-spacing:-0.8px;line-height:1.12;margin-bottom:28px;color:#ffffff;}
-.section-body{font-size:16px;color:var(--muted);line-height:1.9;margin-bottom:32px;max-width:640px;}
-
-/* =========== CALLOUT BOXES (glassmorphism) =========== */
-.callout{border-radius:14px;padding:30px;margin:32px 0;position:relative;overflow:hidden;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);}
-.callout::before{content:'';position:absolute;top:-30px;right:-30px;width:140px;height:140px;border-radius:50%;opacity:0.08;}
-.callout-amber{background:rgba(245,158,11,0.06);border:1px solid rgba(245,158,11,0.15);}
-.callout-amber::before{background:var(--amber);}
-.callout-green{background:rgba(16,185,129,0.06);border:1px solid rgba(16,185,129,0.15);}
-.callout-green::before{background:var(--green);}
-.callout-red{background:rgba(239,68,68,0.06);border:1px solid rgba(239,68,68,0.15);}
-.callout-red::before{background:var(--red);}
-.callout-blue{background:rgba(59,130,246,0.06);border:1px solid rgba(59,130,246,0.15);}
-.callout-blue::before{background:var(--accent);}
-.callout-purple{background:rgba(139,92,246,0.06);border:1px solid rgba(139,92,246,0.15);}
-.callout-purple::before{background:var(--purple);}
-.callout-label{font-size:10px;font-weight:800;letter-spacing:1.8px;text-transform:uppercase;margin-bottom:12px;}
-.callout-amber .callout-label{color:var(--amber);}
-.callout-green .callout-label{color:var(--green);}
-.callout-red .callout-label{color:var(--red);}
-.callout-blue .callout-label{color:var(--accent);}
-.callout-purple .callout-label{color:var(--purple);}
-.callout p.callout-text{font-size:14px;line-height:1.8;color:#c8c8da;}
-
-/* =========== TOOL CARD =========== */
-.tool-card{background:var(--glass);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:1px solid var(--border);border-radius:18px;padding:40px;margin:32px 0;position:relative;overflow:hidden;}
-.tool-card::after{content:'';position:absolute;top:-60px;right:-60px;width:200px;height:200px;border-radius:50%;background:radial-gradient(circle,rgba(59,130,246,0.12),transparent);}
-.tool-name{font-size:30px;font-weight:900;background:linear-gradient(135deg,var(--accent),var(--cyan));-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:10px;}
-.tool-desc{font-size:15px;color:var(--muted);margin-bottom:28px;line-height:1.75;}
-.tool-usecase-label{font-size:10px;font-weight:800;color:var(--dim);letter-spacing:1.8px;text-transform:uppercase;margin-bottom:10px;}
-.tool-usecase{font-size:14px;color:var(--text);line-height:1.8;}
-
-/* =========== CTA SECTION =========== */
-.cta-section{text-align:center;padding:120px 0;position:relative;overflow:hidden;}
-.cta-glow{position:absolute;top:50%;left:50%;width:500px;height:500px;border-radius:50%;background:radial-gradient(circle,rgba(139,92,246,0.1) 0%,rgba(59,130,246,0.05) 40%,transparent 70%);transform:translate(-50%,-50%);}
-.cta-section h2{font-size:clamp(30px,5vw,48px);font-weight:900;letter-spacing:-1px;margin-bottom:18px;color:#fff;position:relative;z-index:1;}
-.cta-sub{font-size:16px;color:var(--muted);max-width:500px;margin:0 auto 36px auto;line-height:1.7;position:relative;z-index:1;}
-.cta-btn{display:inline-block;background:linear-gradient(135deg,var(--accent),var(--purple));color:#fff;font-size:14px;font-weight:700;padding:16px 40px;border-radius:50px;text-decoration:none;letter-spacing:0.5px;transition:all 0.3s;position:relative;z-index:1;box-shadow:0 4px 24px rgba(59,130,246,0.25);}
-.cta-btn:hover{transform:translateY(-3px);box-shadow:0 8px 32px rgba(59,130,246,0.35);}
-
-/* =========== ARTICLE GRID =========== */
-.article-grid{display:grid;grid-template-columns:1fr;gap:18px;margin-top:40px;}
-@media(min-width:640px){.article-grid{grid-template-columns:1fr 1fr;}}
-.article-card{display:block;background:var(--glass);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1px solid var(--border);border-radius:14px;padding:26px;text-decoration:none;transition:all 0.35s;}
-.article-card:hover{border-color:rgba(59,130,246,0.3);transform:translateY(-5px);box-shadow:0 20px 50px rgba(0,0,0,0.4),0 0 30px rgba(59,130,246,0.06);}
-.article-meta{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;}
-.article-cat{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.6px;}
-.score-ring{flex-shrink:0;}
-.article-card h4{font-size:14px;font-weight:700;color:var(--text);line-height:1.45;margin-bottom:10px;}
-.article-card p{font-size:12px;color:var(--muted);line-height:1.65;margin-bottom:14px;}
-.article-source{font-size:11px;color:var(--dim);}
-
-/* =========== PROGRESS NAV (side dots) =========== */
-.progress-nav{position:fixed;right:28px;top:50%;transform:translateY(-50%);z-index:100;display:flex;flex-direction:column;gap:14px;}
-.progress-dot{width:10px;height:10px;border-radius:50%;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.08);transition:all 0.4s;cursor:pointer;display:block;}
-.progress-dot.active{background:var(--accent);border-color:var(--accent);box-shadow:0 0 14px rgba(59,130,246,0.5);transform:scale(1.2);}
-@media(max-width:768px){.progress-nav{display:none;}}
-
-/* =========== FOOTER =========== */
-footer{text-align:center;padding:60px 0 50px 0;position:relative;}
-footer::before{content:'';display:block;height:1px;max-width:200px;margin:0 auto 40px auto;background:linear-gradient(90deg,transparent,var(--border),transparent);}
-.footer-pulse{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--accent);margin-right:8px;vertical-align:middle;animation:fpulse 2s ease-in-out infinite;}
-@keyframes fpulse{0%,100%{opacity:0.4;box-shadow:0 0 0 0 rgba(59,130,246,0);}50%{opacity:1;box-shadow:0 0 8px 3px rgba(59,130,246,0.3);}}
-footer p{font-size:12px;color:var(--dim);}
-
-/* =========== RESPONSIVE =========== */
-@media(max-width:600px){
-  .stats-row{grid-template-columns:1fr;gap:12px;}
-  .hero h1{letter-spacing:-1px;}
-  section{padding:60px 0 70px 0;}
-  .callout,.tool-card,.exec-bar{padding:24px;}
-}
-</style>
-</head>
-<body>
-
-<!-- READING PROGRESS BAR -->
-<div id="reading-progress"></div>
-
-<!-- PROGRESS NAV (side dots) -->
-<nav class="progress-nav" id="prog-nav">
-  <a href="#hero" class="progress-dot active" title="Top"></a>
-  <a href="#s1" class="progress-dot" title="Market Signal"></a>
-  <a href="#s2" class="progress-dot" title="Research"></a>
-  <a href="#s3" class="progress-dot" title="Tool"></a>
-  <a href="#s4" class="progress-dot" title="Risk"></a>
-  <a href="#s5" class="progress-dot" title="Opportunity"></a>
-  <a href="#sources" class="progress-dot" title="Sources"></a>
-</nav>
-
-<!-- ===================== HERO ===================== -->
-<div class="hero" id="hero">
-  <canvas id="particle-canvas"></canvas>
-  <div class="hero-glow"></div>
-  <div class="hero-content">
-    <div class="reveal">
-      <p class="hero-label">AI Intelligence Brief &mdash; Week 8</p>
-      <h1>What's Shaping AI<br>This Week</h1>
-      <p class="hero-sub">The most important breakthroughs, market moves, and emerging tools from 14 sources, distilled into pure signal.</p>
-      <p class="hero-meta">Feb 17 - Feb 24, 2026 &nbsp;&middot;&nbsp; 12 top articles &nbsp;&middot;&nbsp; 7.7 avg score</p>
-    </div>
-  </div>
-  <div class="scroll-hint">
-    <svg width="28" height="28" viewBox="0 0 24 24" fill="none"><path d="M12 5v14" stroke="rgba(139,92,246,0.6)" stroke-width="2" stroke-linecap="round"/><path d="M5 12l7 7 7-7" stroke="rgba(139,92,246,0.6)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-  </div>
-</div>
-
-<!-- ===================== STATS ===================== -->
-<div class="container">
-<div class="stats-row reveal">
-  <div class="stat-card">
-    <div class="stat-number c-blue" data-count="12">0</div>
-    <div class="stat-label">Top Articles</div>
-  </div>
-  <div class="stat-card">
-    <div class="stat-number c-green" data-count="14">0</div>
-    <div class="stat-label">Sources Scanned</div>
-  </div>
-  <div class="stat-card">
-    <div class="stat-number c-amber" data-count="7.7" data-decimals="1">0</div>
-    <div class="stat-label">Avg Relevance Score</div>
-  </div>
-</div>
-</div>
-
-<!-- ===================== EXECUTIVE SUMMARY ===================== -->
-<div class="container">
-<div class="exec-bar reveal">
-  <p class="exec-label">Executive Summary</p>
-  <p class="exec-body">Global AI investment is surging, with the US and China charting distinct development paths. India is emerging as a significant AI hub, attracting major investments and partnerships, particularly in manufacturing and enterprise solutions. Concurrently, critical safety and security concerns surrounding autonomous AI agents are escalating, demanding robust mitigation strategies and regulatory attention.</p>
-</div>
-</div>
-
-<div class="grad-divider gd-blue"></div>
-
-<!-- ===================== 01 MARKET SIGNAL ===================== -->
-<section id="s1">
-<div class="container">
-  <div class="section-icon icon-amber reveal">
-    <svg viewBox="0 0 24 24" fill="none"><path d="M3 17l4-5 4 3 6-8" stroke="#f59e0b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="21" cy="7" r="2" fill="#f59e0b"/></svg>
-  </div>
-  <p class="section-num sn-amber reveal">01 &mdash; The Shift</p>
-  <h2 class="section-head reveal reveal-delay-1">India Ascends as a Global AI Powerhouse Amidst Shifting Geopolitical Landscapes</h2>
-  <p class="section-body reveal reveal-delay-2">This week&#x27;s signals confirm a dramatic acceleration in global AI investment, projected to reach $700 billion, driven by US-China competition. India, in particular, is solidifying its position as a major AI player. The nation is hosting high-level summits, attracting significant investment from tech giants like NVIDIA for its national AI strategy and industrial sectors. Initiatives like &#x27;OpenAI for India&#x27; and Google DeepMind&#x27;s partnerships signal a concerted effort to scale AI adoption for science, education, and enterprise, supported by local system integrators leveraging advanced AI platforms.</p>
-  <div class="callout callout-amber reveal reveal-delay-3">
-    <p class="callout-label">Why This Matters</p>
-    <p class="callout-text">India&#x27;s rapid AI development and investment present a significant market opportunity for our company. We must monitor the growth of AI adoption in Indian enterprises and educational institutions to identify potential partnerships, customer segments, and talent pools. Understanding the specific AI solutions being deployed, particularly those leveraging NVIDIA&#x27;s ecosystem, will be crucial for competitive positioning.</p>
-  </div>
-</div>
-</section>
-
-<div class="grad-divider gd-green"></div>
-
-<!-- ===================== 02 RESEARCH ===================== -->
-<section id="s2">
-<div class="container">
-  <div class="section-icon icon-green reveal">
-    <svg viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="6" stroke="#10b981" stroke-width="2"/><path d="M16 16l5 5" stroke="#10b981" stroke-width="2" stroke-linecap="round"/><circle cx="11" cy="11" r="2.5" fill="#10b981" opacity="0.4"/></svg>
-  </div>
-  <p class="section-num sn-green reveal">02 &mdash; The Breakthrough</p>
-  <h2 class="section-head reveal reveal-delay-1">Advancements in Autonomous AI Agents Highlight Both Potential and Peril</h2>
-  <p class="section-body reveal reveal-delay-2">Recent developments showcase the increasing sophistication of AI agents. NASA successfully employed AI to autonomously navigate the Perseverance rover, demonstrating advanced capabilities for remote operations. Concurrently, Google DeepMind released Gemini 3.1 Pro, enhancing its ability to handle complex tasks, and integrated music generation capabilities. However, this progress is shadowed by critical safety concerns. Incidents involving autonomous agents like OpenClaw running amok in inboxes and exploiting vulnerabilities in coding agents underscore the immediate risks of uncontrolled AI behavior. OpenAI&#x27;s commitment to AI alignment research and Microsoft&#x27;s efforts to combat AI-generated deception reflect the industry&#x27;s growing awareness and efforts to address these challenges.</p>
-  <div class="callout callout-green reveal reveal-delay-3">
-    <p class="callout-label">Strategic Takeaway</p>
-    <p class="callout-text">The dual advancements in agentic AI capabilities and the highlighted risks necessitate a proactive approach to AI safety and security within our product development. Engineering must prioritize robust testing, containment, and monitoring mechanisms for any agentic systems we develop or integrate. Leadership should consider establishing clear ethical guidelines and risk assessment frameworks for deploying autonomous AI functionalities.</p>
-  </div>
-</div>
-</section>
-
-<div class="grad-divider gd-blue"></div>
-
-<!-- ===================== 03 TOOL ===================== -->
-<section id="s3">
-<div class="container">
-  <div class="section-icon icon-blue reveal">
-    <svg viewBox="0 0 24 24" fill="none"><rect x="5" y="3" width="14" height="18" rx="2" stroke="#3b82f6" stroke-width="2"/><path d="M9 8h6M9 12h6M9 16h3" stroke="#3b82f6" stroke-width="1.5" stroke-linecap="round"/></svg>
-  </div>
-  <p class="section-num sn-blue reveal">03 &mdash; The Tool</p>
-  <div class="tool-card reveal reveal-delay-1">
-    <p class="tool-name">Amazon Bedrock AgentCore</p>
-    <p class="tool-desc">A platform to help build unified customer intelligence by integrating data from various enterprise systems.</p>
-    <p class="tool-usecase-label">Practical Use Case</p>
-    <p class="tool-usecase">We can leverage AgentCore to create a unified view of customer interactions by integrating data from our CRM, support ticketing system, and internal knowledge bases, enabling more informed product development and customer support decisions.</p>
-  </div>
-</div>
-</section>
-
-<div class="grad-divider gd-red"></div>
-
-<!-- ===================== 04 RISK ===================== -->
-<section id="s4">
-<div class="container">
-  <div class="section-icon icon-red reveal">
-    <svg viewBox="0 0 24 24" fill="none"><path d="M12 4l9 16H3L12 4z" stroke="#ef4444" stroke-width="2" stroke-linejoin="round"/><path d="M12 10v4" stroke="#ef4444" stroke-width="2" stroke-linecap="round"/><circle cx="12" cy="17" r="1" fill="#ef4444"/></svg>
-  </div>
-  <p class="section-num sn-red reveal">04 &mdash; Risk &amp; Regulation</p>
-  <p class="section-body reveal reveal-delay-1">The proliferation of autonomous AI agents, exemplified by the OpenClaw incident, presents a clear and present danger. Exploitable vulnerabilities in these agents can lead to widespread system compromise, data breaches, and operational disruption. The increasing integration of AI into critical infrastructure, including defense, further amplifies these risks.</p>
-  <div class="callout callout-red reveal reveal-delay-2">
-    <p class="callout-label">Action Consideration</p>
-    <p class="callout-text">Implement stringent security protocols for all AI agents, including sandboxing, access control, and continuous monitoring for anomalous behavior. Conduct thorough third-party risk assessments for any AI agent or library integrated into our systems.</p>
-  </div>
-</div>
-</section>
-
-<div class="grad-divider gd-purple"></div>
-
-<!-- ===================== 05 OPPORTUNITY ===================== -->
-<section class="cta-section" id="s5">
-  <div class="cta-glow"></div>
-  <div class="container">
-    <div class="reveal">
-      <div class="section-icon icon-purple" style="margin:0 auto 18px auto;">
-        <svg viewBox="0 0 24 24" fill="none"><path d="M12 3v4M12 17v4M3 12h4M17 12h4" stroke="#8b5cf6" stroke-width="2" stroke-linecap="round"/><circle cx="12" cy="12" r="4" stroke="#8b5cf6" stroke-width="2"/></svg>
-      </div>
-      <p class="section-num sn-purple" style="margin-bottom:16px;">05 &mdash; Opportunity Spotlight</p>
-      <h2>What Could We Build Next?</h2>
-      <p class="cta-sub">Explore the development of a secure, internal AI agent framework designed for specific business functions (e.g., market research synthesis, code review assistance). This initiative should prioritize robust safety guardrails, transparent operation, and a clear evaluation methodology to mitigate risks while harnessing the benefits of agentic AI.</p>
-      <a href="mailto:ai-team@company.com?subject=AI Experiment Proposal - Week 8" class="cta-btn">Propose an AI Experiment</a>
-    </div>
-  </div>
-</section>
-
-<div class="grad-divider gd-cyan"></div>
-
-<!-- ===================== SOURCE ARTICLES ===================== -->
-<section id="sources" style="padding-bottom:60px;">
-<div class="container-wide">
-  <div style="text-align:center;">
-    <p class="section-num sn-blue reveal">Source Intelligence</p>
-    <h2 class="section-head reveal reveal-delay-1" style="font-size:clamp(24px,3.5vw,36px);text-align:center;">This week's top signals</h2>
-  </div>
-  <div class="article-grid reveal reveal-delay-2">
-    
-      <a href="https://spectrum.ieee.org/ai-futures-us-china" target="_blank" class="article-card" style="border-top:2px solid rgba(245,158,11,0.5);">
-        <div class="article-meta">
-          <span class="article-cat" style="color:#f59e0b">Market Signal</span>
-          <svg class="score-ring" width="36" height="36" viewBox="0 0 36 36">
-            <circle cx="18" cy="18" r="16" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="2.5"/>
-            <circle cx="18" cy="18" r="16" fill="none" stroke="#f59e0b" stroke-width="2.5"
-              stroke-dasharray="100.53" stroke-dashoffset="10.052999999999997"
-              stroke-linecap="round" transform="rotate(-90 18 18)" style="transition:stroke-dashoffset 1s ease;"/>
-            <text x="18" y="19" text-anchor="middle" dominant-baseline="middle"
-              fill="#f59e0b" font-size="10" font-weight="800">9</text>
-          </svg>
-        </div>
-        <h4>The U.S. and China Are Pursuing Different AI Futures</h4>
-        <p>Details how the US and China are taking distinct approaches to AI development, influencing global AI spending projected to hit $700 billion.</p>
-        <span class="article-source">IEEE Spectrum AI</span>
-      </a>
-      <a href="https://blogs.nvidia.com/blog/india-ai-mission-nvidia-partnership/" target="_blank" class="article-card" style="border-top:2px solid rgba(245,158,11,0.5);">
-        <div class="article-meta">
-          <span class="article-cat" style="color:#f59e0b">Market Signal</span>
-          <svg class="score-ring" width="36" height="36" viewBox="0 0 36 36">
-            <circle cx="18" cy="18" r="16" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="2.5"/>
-            <circle cx="18" cy="18" r="16" fill="none" stroke="#f59e0b" stroke-width="2.5"
-              stroke-dasharray="100.53" stroke-dashoffset="10.052999999999997"
-              stroke-linecap="round" transform="rotate(-90 18 18)" style="transition:stroke-dashoffset 1s ease;"/>
-            <text x="18" y="19" text-anchor="middle" dominant-baseline="middle"
-              fill="#f59e0b" font-size="10" font-weight="800">9</text>
-          </svg>
-        </div>
-        <h4>India Fuels Its AI Mission With NVIDIA</h4>
-        <p>NVIDIA is a key partner in India&#x27;s national AI strategy, the IndiaAI Mission, aiming to accelerate the country&#x27;s AI industrial revolution through collaboration with global leaders.</p>
-        <span class="article-source">NVIDIA AI Blog</span>
-      </a>
-      <a href="https://www.wired.com/story/nvidia-meta-deal-new-era-computing-power/" target="_blank" class="article-card" style="border-top:2px solid rgba(245,158,11,0.5);">
-        <div class="article-meta">
-          <span class="article-cat" style="color:#f59e0b">Market Signal</span>
-          <svg class="score-ring" width="36" height="36" viewBox="0 0 36 36">
-            <circle cx="18" cy="18" r="16" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="2.5"/>
-            <circle cx="18" cy="18" r="16" fill="none" stroke="#f59e0b" stroke-width="2.5"
-              stroke-dasharray="100.53" stroke-dashoffset="20.105999999999995"
-              stroke-linecap="round" transform="rotate(-90 18 18)" style="transition:stroke-dashoffset 1s ease;"/>
-            <text x="18" y="19" text-anchor="middle" dominant-baseline="middle"
-              fill="#f59e0b" font-size="10" font-weight="800">8</text>
-          </svg>
-        </div>
-        <h4>NVIDIA’s Deal With Meta Signals a New Era in Computing Power</h4>
-        <p>Nvidia&#x27;s agreement with Meta signifies a shift towards integrated computing power (GPUs and CPUs) rather than discrete chips, reflecting the evolving hardware needs of AI giants.</p>
-        <span class="article-source">Wired AI</span>
-      </a>
-      <a href="https://techcrunch.com/2024/02/20/india-ai-impact-summit-news/" target="_blank" class="article-card" style="border-top:2px solid rgba(245,158,11,0.5);">
-        <div class="article-meta">
-          <span class="article-cat" style="color:#f59e0b">Market Signal</span>
-          <svg class="score-ring" width="36" height="36" viewBox="0 0 36 36">
-            <circle cx="18" cy="18" r="16" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="2.5"/>
-            <circle cx="18" cy="18" r="16" fill="none" stroke="#f59e0b" stroke-width="2.5"
-              stroke-dasharray="100.53" stroke-dashoffset="20.105999999999995"
-              stroke-linecap="round" transform="rotate(-90 18 18)" style="transition:stroke-dashoffset 1s ease;"/>
-            <text x="18" y="19" text-anchor="middle" dominant-baseline="middle"
-              fill="#f59e0b" font-size="10" font-weight="800">8</text>
-          </svg>
-        </div>
-        <h4>All the important news from the ongoing India AI Impact Summit</h4>
-        <p>The India AI Impact Summit is drawing major AI labs and heads of state, signaling critical discussions on AI&#x27;s future, market dynamics, and regulation.</p>
-        <span class="article-source">TechCrunch AI</span>
-      </a>
-      <a href="https://www.theverge.com/2024/2/21/24078575/samsung-galaxy-ai-perplexity-integration-bixby-gemini" target="_blank" class="article-card" style="border-top:2px solid rgba(245,158,11,0.5);">
-        <div class="article-meta">
-          <span class="article-cat" style="color:#f59e0b">Market Signal</span>
-          <svg class="score-ring" width="36" height="36" viewBox="0 0 36 36">
-            <circle cx="18" cy="18" r="16" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="2.5"/>
-            <circle cx="18" cy="18" r="16" fill="none" stroke="#f59e0b" stroke-width="2.5"
-              stroke-dasharray="100.53" stroke-dashoffset="20.105999999999995"
-              stroke-linecap="round" transform="rotate(-90 18 18)" style="transition:stroke-dashoffset 1s ease;"/>
-            <text x="18" y="19" text-anchor="middle" dominant-baseline="middle"
-              fill="#f59e0b" font-size="10" font-weight="800">8</text>
-          </svg>
-        </div>
-        <h4>Samsung is adding Perplexity to Galaxy AI</h4>
-        <p>Samsung is integrating Perplexity into its Galaxy AI ecosystem, creating a multi-agent environment where users can interact with different AI agents for various tasks.</p>
-        <span class="article-source">The Verge AI</span>
-      </a>
-      <a href="https://techcrunch.com/2024/02/20/a-meta-ai-security-researcher-said-an-openclaw-agent-ran-amok-on-her-inbox/" target="_blank" class="article-card" style="border-top:2px solid rgba(139,92,246,0.5);">
-        <div class="article-meta">
-          <span class="article-cat" style="color:#8b5cf6">Risk / Regulation</span>
-          <svg class="score-ring" width="36" height="36" viewBox="0 0 36 36">
-            <circle cx="18" cy="18" r="16" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="2.5"/>
-            <circle cx="18" cy="18" r="16" fill="none" stroke="#8b5cf6" stroke-width="2.5"
-              stroke-dasharray="100.53" stroke-dashoffset="20.105999999999995"
-              stroke-linecap="round" transform="rotate(-90 18 18)" style="transition:stroke-dashoffset 1s ease;"/>
-            <text x="18" y="19" text-anchor="middle" dominant-baseline="middle"
-              fill="#8b5cf6" font-size="10" font-weight="800">8</text>
-          </svg>
-        </div>
-        <h4>A Meta AI security researcher said an OpenClaw agent ran amok on her inbox</h4>
-        <p>A Meta AI security researcher reported an &#x27;OpenClaw&#x27; agent causing issues in her inbox, highlighting critical safety concerns with autonomous AI agents.</p>
-        <span class="article-source">TechCrunch AI</span>
-      </a>
-      <a href="https://www.theverge.com/2024/2/21/24077878/ai-security-nightmare-openclaw-lobster-exploit-adnan-khan" target="_blank" class="article-card" style="border-top:2px solid rgba(139,92,246,0.5);">
-        <div class="article-meta">
-          <span class="article-cat" style="color:#8b5cf6">Risk / Regulation</span>
-          <svg class="score-ring" width="36" height="36" viewBox="0 0 36 36">
-            <circle cx="18" cy="18" r="16" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="2.5"/>
-            <circle cx="18" cy="18" r="16" fill="none" stroke="#8b5cf6" stroke-width="2.5"
-              stroke-dasharray="100.53" stroke-dashoffset="20.105999999999995"
-              stroke-linecap="round" transform="rotate(-90 18 18)" style="transition:stroke-dashoffset 1s ease;"/>
-            <text x="18" y="19" text-anchor="middle" dominant-baseline="middle"
-              fill="#8b5cf6" font-size="10" font-weight="800">8</text>
-          </svg>
-        </div>
-        <h4>The AI security nightmare is here and it looks suspiciously like lobster</h4>
-        <p>A hacker exploited a vulnerability in the open-source AI coding agent Cline to install OpenClaw across systems, demonstrating immediate security risks from autonomous software.</p>
-        <span class="article-source">The Verge AI</span>
-      </a>
-      <a href="https://spectrum.ieee.org/nasa-ai-perseverance-rover" target="_blank" class="article-card" style="border-top:2px solid rgba(16,185,129,0.5);">
-        <div class="article-meta">
-          <span class="article-cat" style="color:#10b981">Research / Technology</span>
-          <svg class="score-ring" width="36" height="36" viewBox="0 0 36 36">
-            <circle cx="18" cy="18" r="16" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="2.5"/>
-            <circle cx="18" cy="18" r="16" fill="none" stroke="#10b981" stroke-width="2.5"
-              stroke-dasharray="100.53" stroke-dashoffset="30.159000000000006"
-              stroke-linecap="round" transform="rotate(-90 18 18)" style="transition:stroke-dashoffset 1s ease;"/>
-            <text x="18" y="19" text-anchor="middle" dominant-baseline="middle"
-              fill="#10b981" font-size="10" font-weight="800">7</text>
-          </svg>
-        </div>
-        <h4>NASA Let AI Drive the Perseverance Rover</h4>
-        <p>NASA&#x27;s Perseverance rover successfully used AI to autonomously generate waypoints and traverse terrain, marking a significant step towards fully autonomous surface rovers.</p>
-        <span class="article-source">IEEE Spectrum AI</span>
-      </a>
-      <a href="https://openai.com/index/advancing-independent-research-on-ai-alignment/" target="_blank" class="article-card" style="border-top:2px solid rgba(16,185,129,0.5);">
-        <div class="article-meta">
-          <span class="article-cat" style="color:#10b981">Research / Technology</span>
-          <svg class="score-ring" width="36" height="36" viewBox="0 0 36 36">
-            <circle cx="18" cy="18" r="16" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="2.5"/>
-            <circle cx="18" cy="18" r="16" fill="none" stroke="#10b981" stroke-width="2.5"
-              stroke-dasharray="100.53" stroke-dashoffset="30.159000000000006"
-              stroke-linecap="round" transform="rotate(-90 18 18)" style="transition:stroke-dashoffset 1s ease;"/>
-            <text x="18" y="19" text-anchor="middle" dominant-baseline="middle"
-              fill="#10b981" font-size="10" font-weight="800">7</text>
-          </svg>
-        </div>
-        <h4>Advancing independent research on AI alignment</h4>
-        <p>OpenAI is committing $7.5 million to The Alignment Project to fund independent research focused on AI safety and security risks associated with advanced AI and AGI.</p>
-        <span class="article-source">OpenAI Blog</span>
-      </a>
-      <a href="https://deepmind.google/discover/blog/gemini-3-1-pro-a-smarter-model-for-your-most-complex-tasks/" target="_blank" class="article-card" style="border-top:2px solid rgba(16,185,129,0.5);">
-        <div class="article-meta">
-          <span class="article-cat" style="color:#10b981">Research / Technology</span>
-          <svg class="score-ring" width="36" height="36" viewBox="0 0 36 36">
-            <circle cx="18" cy="18" r="16" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="2.5"/>
-            <circle cx="18" cy="18" r="16" fill="none" stroke="#10b981" stroke-width="2.5"
-              stroke-dasharray="100.53" stroke-dashoffset="30.159000000000006"
-              stroke-linecap="round" transform="rotate(-90 18 18)" style="transition:stroke-dashoffset 1s ease;"/>
-            <text x="18" y="19" text-anchor="middle" dominant-baseline="middle"
-              fill="#10b981" font-size="10" font-weight="800">7</text>
-          </svg>
-        </div>
-        <h4>Gemini 3.1 Pro: A smarter model for your most complex tasks</h4>
-        <p>Google DeepMind has released Gemini 3.1 Pro, an advanced AI model engineered for handling complex tasks requiring sophisticated applications.</p>
-        <span class="article-source">Google DeepMind</span>
-      </a>
-      <a href="https://www.technologyreview.com/2024/02/21/1090470/microsoft-ai-watermarking-plan-prove-real-fake-online/" target="_blank" class="article-card" style="border-top:2px solid rgba(139,92,246,0.5);">
-        <div class="article-meta">
-          <span class="article-cat" style="color:#8b5cf6">Risk / Regulation</span>
-          <svg class="score-ring" width="36" height="36" viewBox="0 0 36 36">
-            <circle cx="18" cy="18" r="16" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="2.5"/>
-            <circle cx="18" cy="18" r="16" fill="none" stroke="#8b5cf6" stroke-width="2.5"
-              stroke-dasharray="100.53" stroke-dashoffset="30.159000000000006"
-              stroke-linecap="round" transform="rotate(-90 18 18)" style="transition:stroke-dashoffset 1s ease;"/>
-            <text x="18" y="19" text-anchor="middle" dominant-baseline="middle"
-              fill="#8b5cf6" font-size="10" font-weight="800">7</text>
-          </svg>
-        </div>
-        <h4>Microsoft has a new plan to prove what’s real and what’s AI online</h4>
-        <p>Microsoft unveiled a blueprint to combat AI-enabled deception online, aiming to help users distinguish between real and AI-generated content.</p>
-        <span class="article-source">MIT Tech Review</span>
-      </a>
-      <a href="https://aws.amazon.com/blogs/ai/build-unified-intelligence-with-amazon-bedrock-agentcore/" target="_blank" class="article-card" style="border-top:2px solid rgba(59,130,246,0.5);">
-        <div class="article-meta">
-          <span class="article-cat" style="color:#3b82f6">Tools / Platforms</span>
-          <svg class="score-ring" width="36" height="36" viewBox="0 0 36 36">
-            <circle cx="18" cy="18" r="16" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="2.5"/>
-            <circle cx="18" cy="18" r="16" fill="none" stroke="#3b82f6" stroke-width="2.5"
-              stroke-dasharray="100.53" stroke-dashoffset="40.212"
-              stroke-linecap="round" transform="rotate(-90 18 18)" style="transition:stroke-dashoffset 1s ease;"/>
-            <text x="18" y="19" text-anchor="middle" dominant-baseline="middle"
-              fill="#3b82f6" font-size="10" font-weight="800">6</text>
-          </svg>
-        </div>
-        <h4>Build unified intelligence with Amazon Bedrock AgentCore</h4>
-        <p>AWS introduced Bedrock AgentCore to help sales representatives build unified customer intelligence by integrating data from platforms like Salesforce and support tickets.</p>
-        <span class="article-source">AWS AI Blog</span>
-      </a>
-  </div>
-</div>
-</section>
-
-<!-- ===================== FOOTER ===================== -->
-<footer>
-<div class="container">
-  <p><span class="footer-pulse"></span>Powered by AI</p>
-  <p style="margin-top:10px;">AI Intelligence Brief &middot; Week 8 &middot; 14 sources &middot; 2026</p>
-</div>
-</footer>
-
-<script>
-// ========== 1. PARTICLE CANVAS (constellation effect) ==========
-(function(){
-  const canvas=document.getElementById('particle-canvas');
-  if(!canvas) return;
-  const ctx=canvas.getContext('2d');
-  let W,H,particles=[];
-  const NUM=50, CONNECT_DIST=120, SPEED=0.35;
-
-  function resize(){
-    W=canvas.width=canvas.offsetWidth;
-    H=canvas.height=canvas.offsetHeight;
-  }
-  window.addEventListener('resize',resize);
-  resize();
-
-  for(let i=0;i<NUM;i++){
-    particles.push({
-      x:Math.random()*W, y:Math.random()*H,
-      vx:(Math.random()-0.5)*SPEED, vy:(Math.random()-0.5)*SPEED,
-      r:Math.random()*1.5+0.5
-    });
-  }
-
-  function draw(){
-    ctx.clearRect(0,0,W,H);
-    for(let i=0;i<particles.length;i++){
-      const p=particles[i];
-      p.x+=p.vx; p.y+=p.vy;
-      if(p.x<0||p.x>W) p.vx*=-1;
-      if(p.y<0||p.y>H) p.vy*=-1;
-      ctx.beginPath();
-      ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
-      ctx.fillStyle='rgba(139,92,246,0.5)';
-      ctx.fill();
-      for(let j=i+1;j<particles.length;j++){
-        const q=particles[j];
-        const dx=p.x-q.x, dy=p.y-q.y;
-        const dist=Math.sqrt(dx*dx+dy*dy);
-        if(dist<CONNECT_DIST){
-          ctx.beginPath();
-          ctx.moveTo(p.x,p.y);
-          ctx.lineTo(q.x,q.y);
-          ctx.strokeStyle='rgba(59,130,246,'+(1-dist/CONNECT_DIST)*0.15+')';
-          ctx.lineWidth=0.6;
-          ctx.stroke();
-        }
+      100% {
+        opacity: 1;
       }
     }
-    requestAnimationFrame(draw);
-  }
-  draw();
-})();
 
-// ========== 2. SCROLL REVEAL ==========
-(function(){
-  const els=document.querySelectorAll('.reveal');
-  const obs=new IntersectionObserver(function(entries){
-    entries.forEach(function(e){
-      if(e.isIntersecting){e.target.classList.add('visible');obs.unobserve(e.target);}
-    });
-  },{threshold:0.1,rootMargin:'0px 0px -50px 0px'});
-  els.forEach(function(el){obs.observe(el);});
-})();
+    /* READING PROGRESS BAR */
+    #reading-progress {
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 2px;
+      background: linear-gradient(90deg, var(--accent), var(--purple), var(--cyan));
+      z-index: 10000;
+      width: 0%;
+      transition: width 0.08s linear;
+      box-shadow: 0 0 12px var(--accent-glow);
+    }
 
-// ========== 3. COUNTER ANIMATION (IntersectionObserver + rAF) ==========
-(function(){
-  const counters=document.querySelectorAll('[data-count]');
-  const obs=new IntersectionObserver(function(entries){
-    entries.forEach(function(e){
-      if(!e.isIntersecting) return;
-      const el=e.target;
-      const target=parseFloat(el.getAttribute('data-count'));
-      const decimals=parseInt(el.getAttribute('data-decimals')||'0',10);
-      const duration=1200;
-      let start=null;
-      function step(ts){
-        if(!start) start=ts;
-        const progress=Math.min((ts-start)/duration,1);
-        const eased=1-Math.pow(1-progress,3);
-        const val=eased*target;
-        el.textContent=decimals>0?val.toFixed(decimals):Math.round(val).toString();
-        if(progress<1) requestAnimationFrame(step);
+    /* SCROLL ANIMATIONS */
+    .reveal {
+      opacity: 0;
+      transform: translateY(40px) scale(0.98);
+      transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+      will-change: opacity, transform;
+    }
+
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+
+    .reveal-delay-1 {
+      transition-delay: 0.15s;
+    }
+
+    .reveal-delay-2 {
+      transition-delay: 0.3s;
+    }
+
+    .reveal-delay-3 {
+      transition-delay: 0.45s;
+    }
+
+    .reveal-delay-4 {
+      transition-delay: 0.6s;
+    }
+
+    /* LAYOUT */
+    .container {
+      max-width: 760px;
+      margin: 0 auto;
+      padding: 0 var(--space-md);
+    }
+
+    .container-wide {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 0 var(--space-md);
+    }
+
+    /* HERO */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+      background: var(--bg);
+    }
+
+    .hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(circle 600px at 50% 40%, rgba(108, 111, 255, 0.08), transparent 70%),
+        radial-gradient(circle 400px at 30% 60%, rgba(167, 139, 250, 0.05), transparent 60%),
+        radial-gradient(circle 300px at 70% 30%, rgba(6, 214, 160, 0.04), transparent 50%);
+      z-index: 0;
+    }
+
+    #particle-canvas {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 2;
+    }
+
+    .hero-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--accent-light);
+      letter-spacing: 3.5px;
+      text-transform: uppercase;
+      padding: 10px 24px;
+      border-radius: 40px;
+      border: 1px solid rgba(108, 111, 255, 0.2);
+      background: rgba(108, 111, 255, 0.05);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+    }
+
+    .hero-label::before {
+      content: '';
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--accent);
+      animation: labelPulse 2s ease-in-out infinite;
+    }
+
+    @keyframes labelPulse {
+
+      0%,
+      100% {
+        opacity: 1;
+        box-shadow: 0 0 0 0 var(--accent-glow);
       }
-      requestAnimationFrame(step);
-      obs.unobserve(el);
-    });
-  },{threshold:0.5});
-  counters.forEach(function(c){obs.observe(c);});
-})();
 
-// ========== 4. READING PROGRESS BAR ==========
-(function(){
-  const bar=document.getElementById('reading-progress');
-  if(!bar) return;
-  window.addEventListener('scroll',function(){
-    const scrollTop=document.documentElement.scrollTop||document.body.scrollTop;
-    const scrollHeight=document.documentElement.scrollHeight-document.documentElement.clientHeight;
-    const pct=scrollHeight>0?(scrollTop/scrollHeight)*100:0;
-    bar.style.width=pct+'%';
-  },{passive:true});
-})();
-
-// ========== 5. PROGRESS DOTS NAVIGATION ==========
-(function(){
-  const dots=document.querySelectorAll('.progress-dot');
-  const targets=[];
-  dots.forEach(function(d){
-    const href=d.getAttribute('href');
-    if(href){const el=document.querySelector(href);if(el)targets.push({dot:d,el:el});}
-  });
-  if(!targets.length) return;
-  const obs=new IntersectionObserver(function(entries){
-    entries.forEach(function(e){
-      if(e.isIntersecting){
-        dots.forEach(function(d){d.classList.remove('active');});
-        const match=targets.find(function(t){return t.el===e.target;});
-        if(match) match.dot.classList.add('active');
+      50% {
+        opacity: 0.6;
+        box-shadow: 0 0 0 6px transparent;
       }
+    }
+
+    .hero h1 {
+      font-size: clamp(44px, 8vw, 84px);
+      font-weight: 800;
+      letter-spacing: -3px;
+      line-height: 0.95;
+      margin: 32px 0;
+      color: var(--text);
+    }
+
+    .hero h1 span {
+      background: linear-gradient(135deg, var(--accent) 0%, var(--cyan) 40%, var(--purple) 80%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-size: 200% 200%;
+      animation: hero-grad 6s ease infinite;
+      filter: drop-shadow(0 0 30px var(--accent-glow));
+    }
+
+    @keyframes hero-grad {
+
+      0%,
+      100% {
+        background-position: 0% 50%;
+      }
+
+      50% {
+        background-position: 100% 50%;
+      }
+    }
+
+    .hero-sub {
+      font-family: 'Source Serif 4', Georgia, serif;
+      font-size: 19px;
+      font-weight: 400;
+      color: var(--body);
+      max-width: 540px;
+      margin: 0 auto;
+      line-height: 1.85;
+      font-style: italic;
+    }
+
+    .hero-meta {
+      margin-top: 32px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      color: var(--muted);
+      letter-spacing: 1.5px;
+    }
+
+    .hero-meta span {
+      color: var(--accent-light);
+    }
+
+    .scroll-hint {
+      position: absolute;
+      bottom: 48px;
+      left: 50%;
+      transform: translateX(-50%);
+      animation: scrollFloat 3s ease-in-out infinite;
+      z-index: 2;
+    }
+
+    .scroll-hint svg {
+      opacity: 0.4;
+    }
+
+    @keyframes scrollFloat {
+
+      0%,
+      100% {
+        transform: translateX(-50%) translateY(0);
+        opacity: 0.4;
+      }
+
+      50% {
+        transform: translateX(-50%) translateY(12px);
+        opacity: 0.7;
+      }
+    }
+
+    /* STAT CARDS */
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--space-md);
+      margin: 0 0 var(--space-2xl) 0;
+      padding-top: var(--space-2xl);
+    }
+
+    @media(max-width:600px) {
+      .stats-row {
+        grid-template-columns: 1fr;
+        gap: var(--space-sm);
+      }
+    }
+
+    .stat-card {
+      background: var(--surface);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 32px 24px;
+      text-align: center;
+      transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .stat-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: var(--radius-lg);
+      padding: 1px;
+      background: linear-gradient(135deg, transparent 40%, rgba(108, 111, 255, 0.15), transparent 60%);
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+      opacity: 0;
+      transition: opacity 0.4s;
+    }
+
+    .stat-card:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 20px 60px rgba(108, 111, 255, 0.08);
+    }
+
+    .stat-card:hover::before {
+      opacity: 1;
+    }
+
+    .stat-number {
+      font-size: 44px;
+      font-weight: 800;
+      letter-spacing: -2px;
+      line-height: 1;
+    }
+
+    .stat-label {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      font-weight: 500;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      margin-top: 8px;
+    }
+
+    .stat-indigo {
+      color: var(--accent-light);
+    }
+
+    .stat-emerald {
+      color: var(--cyan);
+    }
+
+    .stat-amber {
+      color: var(--amber);
+    }
+
+    /* GRADIENT DIVIDERS */
+    .grad-divider {
+      height: 1px;
+      border-radius: 1px;
+      margin: 0;
+      opacity: 0.8;
+    }
+
+    .gd-rainbow {
+      background: linear-gradient(90deg, var(--accent), var(--purple), var(--cyan), var(--emerald));
+      height: 2px;
+      opacity: 0.6;
+    }
+
+    .gd-amber {
+      background: linear-gradient(90deg, var(--amber), transparent);
+    }
+
+    .gd-emerald {
+      background: linear-gradient(90deg, var(--cyan), transparent);
+    }
+
+    .gd-indigo {
+      background: linear-gradient(90deg, var(--accent), transparent);
+    }
+
+    .gd-rose {
+      background: linear-gradient(90deg, var(--rose), transparent);
+    }
+
+    .gd-purple {
+      background: linear-gradient(90deg, var(--purple), transparent);
+    }
+
+    /* SECTIONS */
+    section {
+      padding: var(--space-2xl) 0 120px 0;
+      position: relative;
+    }
+
+    .section-icon {
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: var(--space-md);
+      transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+      background: var(--surface);
+      border: 1px solid var(--border);
+      position: relative;
+    }
+
+    .section-icon::after {
+      content: '';
+      position: absolute;
+      inset: -4px;
+      border-radius: 50%;
+      border: 1px solid transparent;
+      transition: all 0.4s;
+    }
+
+    .section-icon:hover {
+      transform: scale(1.15) rotate(5deg);
+    }
+
+    .section-icon svg {
+      width: 22px;
+      height: 22px;
+    }
+
+    .si-amber:hover {
+      box-shadow: 0 0 30px var(--amber-glow);
+      border-color: rgba(255, 184, 77, 0.3);
+    }
+
+    .si-emerald:hover {
+      box-shadow: 0 0 30px var(--cyan-glow);
+      border-color: rgba(6, 214, 160, 0.3);
+    }
+
+    .si-indigo:hover {
+      box-shadow: 0 0 30px var(--accent-glow);
+      border-color: rgba(108, 111, 255, 0.3);
+    }
+
+    .si-rose:hover {
+      box-shadow: 0 0 30px var(--rose-glow);
+      border-color: rgba(255, 107, 138, 0.3);
+    }
+
+    .si-purple:hover {
+      box-shadow: 0 0 30px var(--purple-glow);
+      border-color: rgba(167, 139, 250, 0.3);
+    }
+
+    .section-num {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 2.5px;
+      text-transform: uppercase;
+      margin-bottom: 10px;
+    }
+
+    .sn-amber {
+      color: var(--amber);
+    }
+
+    .sn-emerald {
+      color: var(--cyan);
+    }
+
+    .sn-indigo {
+      color: var(--accent-light);
+    }
+
+    .sn-rose {
+      color: var(--rose);
+    }
+
+    .sn-purple {
+      color: var(--purple);
+    }
+
+    .section-head {
+      font-size: clamp(28px, 4.5vw, 44px);
+      font-weight: 800;
+      letter-spacing: -1px;
+      line-height: 1.1;
+      margin-bottom: var(--space-md);
+      color: var(--text);
+    }
+
+    .section-body {
+      font-family: 'Source Serif 4', Georgia, serif;
+      font-size: 18px;
+      color: var(--body);
+      line-height: 1.9;
+      margin-bottom: var(--space-lg);
+      max-width: 640px;
+    }
+
+    .section-body::first-line {
+      color: var(--text-secondary);
+      font-weight: 500;
+    }
+
+    /* CALLOUT BOXES */
+    .callout {
+      border-radius: var(--radius-md);
+      padding: 28px 32px;
+      margin: 32px 0;
+      background: var(--surface);
+      position: relative;
+      overflow: hidden;
+      transition: all 0.3s;
+    }
+
+    .callout::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      width: 3px;
+    }
+
+    .callout:hover {
+      transform: translateX(4px);
+    }
+
+    .callout-label {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      margin-bottom: 10px;
+    }
+
+    .callout p.callout-text {
+      font-family: 'Source Serif 4', Georgia, serif;
+      font-size: 15px;
+      line-height: 1.8;
+      color: var(--body);
+    }
+
+    .callout-amber {
+      border: 1px solid rgba(255, 184, 77, 0.12);
+    }
+
+    .callout-amber::before {
+      background: var(--amber);
+    }
+
+    .callout-amber .callout-label {
+      color: var(--amber);
+    }
+
+    .callout-amber:hover {
+      box-shadow: 0 8px 30px var(--amber-glow);
+    }
+
+    .callout-emerald {
+      border: 1px solid rgba(6, 214, 160, 0.12);
+    }
+
+    .callout-emerald::before {
+      background: var(--cyan);
+    }
+
+    .callout-emerald .callout-label {
+      color: var(--cyan);
+    }
+
+    .callout-emerald:hover {
+      box-shadow: 0 8px 30px var(--cyan-glow);
+    }
+
+    .callout-rose {
+      border: 1px solid rgba(255, 107, 138, 0.12);
+    }
+
+    .callout-rose::before {
+      background: var(--rose);
+    }
+
+    .callout-rose .callout-label {
+      color: var(--rose);
+    }
+
+    .callout-rose:hover {
+      box-shadow: 0 8px 30px var(--rose-glow);
+    }
+
+    /* TOOL CARD */
+    .tool-card {
+      background: var(--surface);
+      border: 1px solid rgba(108, 111, 255, 0.1);
+      border-radius: var(--radius-lg);
+      padding: 40px;
+      margin: var(--space-md) 0;
+      position: relative;
+      overflow: hidden;
+      transition: all 0.4s;
+    }
+
+    .tool-card::before {
+      content: '';
+      position: absolute;
+      top: -100px;
+      right: -100px;
+      width: 300px;
+      height: 300px;
+      border-radius: 50%;
+      background: radial-gradient(circle, var(--accent-glow), transparent 70%);
+      transition: all 0.6s;
+    }
+
+    .tool-card:hover {
+      border-color: rgba(108, 111, 255, 0.2);
+      box-shadow: 0 20px 60px rgba(108, 111, 255, 0.06);
+    }
+
+    .tool-card:hover::before {
+      transform: scale(1.3);
+    }
+
+    .tool-name {
+      font-size: 30px;
+      font-weight: 800;
+      color: var(--accent-light);
+      margin-bottom: 12px;
+      letter-spacing: -0.5px;
+      position: relative;
+    }
+
+    .tool-desc {
+      font-family: 'Source Serif 4', Georgia, serif;
+      font-size: 17px;
+      color: var(--body);
+      margin-bottom: 28px;
+      line-height: 1.8;
+      position: relative;
+    }
+
+    .tool-usecase-label {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--accent);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      margin-bottom: 10px;
+      position: relative;
+    }
+
+    .tool-usecase {
+      font-family: 'Source Serif 4', Georgia, serif;
+      font-size: 15px;
+      color: var(--body);
+      line-height: 1.8;
+      position: relative;
+    }
+
+    /* CTA */
+    .cta-section {
+      text-align: center;
+      padding: 120px 0;
+      position: relative;
+    }
+
+    .cta-section::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle 400px at 50% 50%, var(--accent-glow), transparent);
+    }
+
+    .cta-section h2 {
+      font-size: clamp(30px, 5vw, 48px);
+      font-weight: 800;
+      letter-spacing: -1px;
+      margin-bottom: var(--space-md);
+      color: var(--text);
+      position: relative;
+    }
+
+    .cta-btn {
+      display: inline-block;
+      position: relative;
+      background: linear-gradient(135deg, var(--accent), var(--purple));
+      color: #fff;
+      font-size: 14px;
+      font-weight: 700;
+      padding: 18px 44px;
+      border-radius: var(--radius-md);
+      text-decoration: none;
+      letter-spacing: 0.5px;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      box-shadow: 0 4px 24px rgba(108, 111, 255, 0.3);
+      overflow: hidden;
+    }
+
+    .cta-btn::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, transparent 30%, rgba(255, 255, 255, 0.1) 50%, transparent 70%);
+      transform: translateX(-100%);
+      transition: transform 0.6s;
+    }
+
+    .cta-btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 12px 48px rgba(108, 111, 255, 0.4);
+    }
+
+    .cta-btn:hover::before {
+      transform: translateX(100%);
+    }
+
+    /* ARTICLE GRID */
+    .article-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: var(--space-sm);
+      margin-top: var(--space-lg);
+    }
+
+    @media(min-width:640px) {
+      .article-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    @media(min-width:900px) {
+      .article-grid {
+        grid-template-columns: 1fr 1fr 1fr;
+      }
+    }
+
+    .article-card {
+      display: block;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 28px;
+      text-decoration: none;
+      transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .article-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: var(--radius-md);
+      padding: 1px;
+      background: linear-gradient(135deg, transparent 40%, var(--border-hover), transparent 60%);
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+      opacity: 0;
+      transition: opacity 0.4s;
+    }
+
+    .article-card:hover {
+      transform: translateY(-8px) scale(1.02);
+    }
+
+    .article-card:hover::before {
+      opacity: 1;
+    }
+
+    .article-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+
+    .article-cat {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 9px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .score-ring {
+      flex-shrink: 0;
+    }
+
+    .article-card h4 {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text);
+      line-height: 1.5;
+      margin-bottom: 10px;
+      transition: color 0.3s;
+    }
+
+    .article-card:hover h4 {
+      color: var(--accent-light);
+    }
+
+    .article-summary {
+      font-family: 'Source Serif 4', Georgia, serif;
+      font-size: 13px;
+      color: var(--body);
+      line-height: 1.7;
+      margin-bottom: 14px;
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .article-source {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      color: var(--muted);
+      letter-spacing: 0.5px;
+    }
+
+    /* EXECUTIVE SUMMARY */
+    .exec-bar {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-xl);
+      padding: 44px;
+      margin: var(--space-2xl) 0;
+      position: relative;
+      overflow: hidden;
+      transition: all 0.4s;
+    }
+
+    .exec-bar::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, var(--accent), var(--purple), var(--cyan), var(--emerald));
+    }
+
+    .exec-bar::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 200px;
+      height: 200px;
+      background: radial-gradient(circle, var(--accent-glow), transparent 70%);
+    }
+
+    .exec-bar:hover {
+      border-color: var(--border-hover);
+      box-shadow: 0 20px 80px rgba(108, 111, 255, 0.04);
+    }
+
+    .exec-bar .exec-label {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--accent);
+      letter-spacing: 2.5px;
+      text-transform: uppercase;
+      margin-bottom: 16px;
+      position: relative;
+    }
+
+    .exec-bar p.exec-text {
+      font-family: 'Source Serif 4', Georgia, serif;
+      font-size: 18px;
+      color: var(--body);
+      line-height: 1.9;
+      position: relative;
+    }
+
+    /* PROGRESS NAV */
+    .progress-nav {
+      position: fixed;
+      right: 28px;
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 100;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      padding: 16px 8px;
+      background: rgba(10, 12, 18, 0.6);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-radius: 20px;
+      border: 1px solid var(--border);
+    }
+
+    .progress-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--dim);
+      transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+      cursor: pointer;
+      border: none;
+      display: block;
+    }
+
+    .progress-dot.active {
+      background: var(--accent);
+      box-shadow: 0 0 16px var(--accent-glow);
+      transform: scale(1.5);
+    }
+
+    .progress-dot:hover:not(.active) {
+      background: var(--muted);
+      transform: scale(1.2);
+    }
+
+    @media(max-width:768px) {
+      .progress-nav {
+        display: none;
+      }
+    }
+
+    /* ALT BG */
+    .alt-bg {
+      background: var(--surface);
+    }
+
+    .alt-bg::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse 60% 40% at 80% 50%, rgba(108, 111, 255, 0.03), transparent);
+      pointer-events: none;
+    }
+
+    /* FOOTER */
+    footer {
+      text-align: center;
+      padding: 80px 0 60px;
+      position: relative;
+    }
+
+    footer::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 10%;
+      right: 10%;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--border), transparent);
+    }
+
+    footer p {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      color: var(--muted);
+      letter-spacing: 0.5px;
+    }
+
+    .footer-pulse {
+      display: inline-block;
+      width: 6px;
+      height: 6px;
+      background: var(--accent);
+      border-radius: 50%;
+      margin-right: 8px;
+      animation: fpulse 2.5s ease-in-out infinite;
+      vertical-align: middle;
+    }
+
+    @keyframes fpulse {
+
+      0%,
+      100% {
+        opacity: 1;
+        box-shadow: 0 0 0 0 var(--accent-glow);
+      }
+
+      50% {
+        opacity: 0.5;
+        box-shadow: 0 0 0 10px transparent;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- READING PROGRESS BAR -->
+  <div id="reading-progress"></div>
+
+  <!-- PROGRESS NAV -->
+  <nav class="progress-nav">
+    <a href="#hero" class="progress-dot active" title="Top"></a>
+    <a href="#s1" class="progress-dot" title="Market Signal"></a>
+    <a href="#s2" class="progress-dot" title="Research"></a>
+    <a href="#s3" class="progress-dot" title="Tool"></a>
+    <a href="#s4" class="progress-dot" title="Risk"></a>
+    <a href="#s5" class="progress-dot" title="Opportunity"></a>
+    <a href="#sources" class="progress-dot" title="Sources"></a>
+  </nav>
+
+  <!-- HERO -->
+  <div class="hero" id="hero">
+    <canvas id="particle-canvas"></canvas>
+    <div class="hero-content">
+      <div class="reveal">
+        <p class="hero-label">AJMS AI Intelligence Brief &nbsp;// &nbsp;Week 8</p>
+        <h1>What's Shaping<br><span>AI This Week</span></h1>
+        <p class="hero-sub">Curated signal from across the world of artificial intelligence. The breakthroughs, tools,
+          and trends your team needs to know.</p>
+        <p class="hero-meta"><span>Week 8</span> &nbsp;// &nbsp;Feb 18 - Feb 25, 2026 &nbsp;// &nbsp;<span>14
+            sources</span></p>
+      </div>
+    </div>
+    <div class="scroll-hint">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+        <path d="M12 5v14M5 12l7 7 7-7" stroke="var(--muted)" stroke-width="2" stroke-linecap="round"
+          stroke-linejoin="round" />
+      </svg>
+    </div>
+  </div>
+
+  <!-- STATS ROW -->
+  <div class="container">
+    <div class="stats-row">
+      <div class="stat-card reveal">
+        <div class="stat-number stat-indigo" data-count="12">0</div>
+        <div class="stat-label">Top Articles</div>
+      </div>
+      <div class="stat-card reveal reveal-delay-1">
+        <div class="stat-number stat-emerald" data-count="14">0</div>
+        <div class="stat-label">Sources Scanned</div>
+      </div>
+      <div class="stat-card reveal reveal-delay-2">
+        <div class="stat-number stat-amber" data-count="7.7" data-decimals="1">0</div>
+        <div class="stat-label">Avg. Score</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- EXECUTIVE SUMMARY -->
+  <div class="container">
+    <div class="exec-bar reveal">
+      <p class="exec-label">Executive Summary</p>
+      <p class="exec-text">Global AI investment is surging, with the US and China charting distinct development paths.
+        India is emerging as a significant AI hub, attracting major investments and partnerships, particularly in
+        manufacturing and enterprise solutions. Concurrently, critical safety and security concerns surrounding
+        autonomous AI agents are escalating, demanding robust mitigation strategies and regulatory attention.</p>
+    </div>
+  </div>
+
+  <!-- GRADIENT DIVIDER -->
+  <div class="container">
+    <div class="grad-divider gd-rainbow reveal"></div>
+  </div>
+
+  <!-- 01 THE SHIFT -->
+  <section id="s1">
+    <div class="container">
+      <div class="section-icon si-amber reveal">
+        <svg viewBox="0 0 24 24" fill="none">
+          <path d="M3 17l4-5 4 3 6-8" stroke="#FBBF24" stroke-width="2" stroke-linecap="round"
+            stroke-linejoin="round" />
+          <circle cx="21" cy="7" r="2" fill="#FBBF24" />
+        </svg>
+      </div>
+      <p class="section-num sn-amber reveal">01 &mdash; The Shift</p>
+      <h2 class="section-head reveal reveal-delay-1">India Ascends as a Global AI Powerhouse Amidst Shifting
+        Geopolitical Landscapes</h2>
+      <p class="section-body reveal reveal-delay-2">This week&#x27;s signals confirm a dramatic acceleration in global
+        AI investment, projected to reach $700 billion, driven by US-China competition. India, in particular, is
+        solidifying its position as a major AI player. The nation is hosting high-level summits, attracting significant
+        investment from tech giants like NVIDIA for its national AI strategy and industrial sectors. Initiatives like
+        &#x27;OpenAI for India&#x27; and Google DeepMind&#x27;s partnerships signal a concerted effort to scale AI
+        adoption for science, education, and enterprise, supported by local system integrators leveraging advanced AI
+        platforms.</p>
+      <div class="callout callout-amber reveal reveal-delay-3">
+        <p class="callout-label">Why This Matters</p>
+        <p class="callout-text">India&#x27;s rapid AI development and investment present a significant market
+          opportunity for our company. We must monitor the growth of AI adoption in Indian enterprises and educational
+          institutions to identify potential partnerships, customer segments, and talent pools. Understanding the
+          specific AI solutions being deployed, particularly those leveraging NVIDIA&#x27;s ecosystem, will be crucial
+          for competitive positioning.</p>
+      </div>
+    </div>
+  </section>
+  <div class="container">
+    <div class="grad-divider gd-amber"></div>
+  </div>
+
+  <!-- 02 THE BREAKTHROUGH -->
+  <section class="alt-bg" id="s2">
+    <div class="container">
+      <div class="section-icon si-emerald reveal">
+        <svg viewBox="0 0 24 24" fill="none">
+          <circle cx="11" cy="11" r="6" stroke="#34D399" stroke-width="2" />
+          <path d="M16 16l5 5" stroke="#34D399" stroke-width="2" stroke-linecap="round" />
+          <circle cx="11" cy="11" r="2.5" fill="#34D399" opacity="0.3" />
+        </svg>
+      </div>
+      <p class="section-num sn-emerald reveal">02 &mdash; The Breakthrough</p>
+      <h2 class="section-head reveal reveal-delay-1">Advancements in Autonomous AI Agents Highlight Both Potential and
+        Peril</h2>
+      <p class="section-body reveal reveal-delay-2">Recent developments showcase the increasing sophistication of AI
+        agents. NASA successfully employed AI to autonomously navigate the Perseverance rover, demonstrating advanced
+        capabilities for remote operations. Concurrently, Google DeepMind released Gemini 3.1 Pro, enhancing its ability
+        to handle complex tasks, and integrated music generation capabilities. However, this progress is shadowed by
+        critical safety concerns. Incidents involving autonomous agents like OpenClaw running amok in inboxes and
+        exploiting vulnerabilities in coding agents underscore the immediate risks of uncontrolled AI behavior.
+        OpenAI&#x27;s commitment to AI alignment research and Microsoft&#x27;s efforts to combat AI-generated deception
+        reflect the industry&#x27;s growing awareness and efforts to address these challenges.</p>
+      <div class="callout callout-emerald reveal reveal-delay-3">
+        <p class="callout-label">Strategic Takeaway</p>
+        <p class="callout-text">The dual advancements in agentic AI capabilities and the highlighted risks necessitate a
+          proactive approach to AI safety and security within our product development. Engineering must prioritize
+          robust testing, containment, and monitoring mechanisms for any agentic systems we develop or integrate.
+          Leadership should consider establishing clear ethical guidelines and risk assessment frameworks for deploying
+          autonomous AI functionalities.</p>
+      </div>
+    </div>
+  </section>
+  <div class="container">
+    <div class="grad-divider gd-emerald"></div>
+  </div>
+
+  <!-- 03 THE TOOL -->
+  <section id="s3">
+    <div class="container">
+      <div class="section-icon si-indigo reveal">
+        <svg viewBox="0 0 24 24" fill="none">
+          <rect x="5" y="3" width="14" height="18" rx="2" stroke="#818CF8" stroke-width="2" />
+          <path d="M9 8h6M9 12h6M9 16h3" stroke="#818CF8" stroke-width="1.5" stroke-linecap="round" />
+        </svg>
+      </div>
+      <p class="section-num sn-indigo reveal">03 &mdash; Tool of the Week</p>
+      <div class="tool-card reveal reveal-delay-1">
+        <p class="tool-name">Amazon Bedrock AgentCore</p>
+        <p class="tool-desc">A platform to help build unified customer intelligence by integrating data from various
+          enterprise systems.</p>
+        <p class="tool-usecase-label">Use Case for Our Team</p>
+        <p class="tool-usecase">We can leverage AgentCore to create a unified view of customer interactions by
+          integrating data from our CRM, support ticketing system, and internal knowledge bases, enabling more informed
+          product development and customer support decisions.</p>
+      </div>
+    </div>
+  </section>
+  <div class="container">
+    <div class="grad-divider gd-indigo"></div>
+  </div>
+
+  <!-- 04 RISK & RESPONSIBILITY -->
+  <section class="alt-bg" id="s4">
+    <div class="container">
+      <div class="section-icon si-rose reveal">
+        <svg viewBox="0 0 24 24" fill="none">
+          <path d="M12 4l9 16H3L12 4z" stroke="#FB7185" stroke-width="2" stroke-linejoin="round" />
+          <path d="M12 10v4" stroke="#FB7185" stroke-width="2" stroke-linecap="round" />
+          <circle cx="12" cy="17" r="1" fill="#FB7185" />
+        </svg>
+      </div>
+      <p class="section-num sn-rose reveal">04 &mdash; Risk Watch</p>
+      <p class="section-body reveal reveal-delay-1">The proliferation of autonomous AI agents, exemplified by the
+        OpenClaw incident, presents a clear and present danger. Exploitable vulnerabilities in these agents can lead to
+        widespread system compromise, data breaches, and operational disruption. The increasing integration of AI into
+        critical infrastructure, including defense, further amplifies these risks.</p>
+      <div class="callout callout-rose reveal reveal-delay-2">
+        <p class="callout-label">Action Consideration</p>
+        <p class="callout-text">Implement stringent security protocols for all AI agents, including sandboxing, access
+          control, and continuous monitoring for anomalous behavior. Conduct thorough third-party risk assessments for
+          any AI agent or library integrated into our systems.</p>
+      </div>
+    </div>
+  </section>
+  <div class="container">
+    <div class="grad-divider gd-rose"></div>
+  </div>
+
+  <!-- 05 INTERNAL MOMENTUM -->
+  <section class="cta-section" id="s5">
+    <div class="container">
+      <div class="reveal">
+        <div class="section-icon si-purple" style="margin:0 auto 16px auto;">
+          <svg viewBox="0 0 24 24" fill="none">
+            <path d="M12 3v4M12 17v4M3 12h4M17 12h4" stroke="#A78BFA" stroke-width="2" stroke-linecap="round" />
+            <circle cx="12" cy="12" r="4" stroke="#A78BFA" stroke-width="2" />
+          </svg>
+        </div>
+        <p class="section-num sn-purple" style="margin-bottom:16px;">05 &mdash; Opportunity</p>
+        <h2>Explore the development of a secure, internal AI agent framework designed for sp</h2>
+        <p class="section-body" style="margin:16px auto;text-align:center;">Explore the development of a secure,
+          internal AI agent framework designed for specific business functions (e.g., market research synthesis, code
+          review assistance). This initiative should prioritize robust safety guardrails, transparent operation, and a
+          clear evaluation methodology to mitigate risks while harnessing the benefits of agentic AI.</p>
+        <a href="mailto:ai-team@company.com?subject=AI Experiment Proposal" class="cta-btn">Propose an AI Experiment</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- SOURCE ARTICLES -->
+  <section class="alt-bg" id="sources">
+    <div class="container-wide">
+      <div style="text-align:center;">
+        <p class="section-num sn-indigo reveal">Source Intelligence</p>
+        <h2 class="section-head reveal reveal-delay-1" style="font-size:28px;text-align:center;">This week's top signals
+        </h2>
+      </div>
+      <div class="article-grid reveal reveal-delay-2">
+
+        <a href="https://spectrum.ieee.org/ai-futures-us-china" target="_blank" class="article-card"
+          style="border-top:3px solid #FFB84D;" data-glow="rgba(255,184,77,0.12)">
+          <div class="article-meta">
+            <span class="article-cat" style="color:#FFB84D">Market Signal</span>
+            <svg class="score-ring" width="36" height="36" viewBox="0 0 36 36">
+              <circle cx="18" cy="18" r="10" fill="none" stroke="#1E2130" stroke-width="2.5" />
+              <circle cx="18" cy="18" r="10" fill="none" stroke="#34D399" stroke-width="2.5"
+                stroke-dasharray="56.5 62.83" stroke-dashoffset="0" stroke-linecap="round"
+                transform="rotate(-90 18 18)" />
+              <text x="18" y="18" text-anchor="middle" dominant-baseline="central" font-size="9" font-weight="700"
+                fill="#34D399">9</text>
+            </svg>
+          </div>
+          <h4>The U.S. and China Are Pursuing Different AI Futures</h4>
+          <p class="article-summary">Details how the US and China are taking distinct approaches to AI development,
+            influencing global AI spending projected to hit $700 billion.</p>
+          <span class="article-source">IEEE Spectrum AI</span>
+        </a>
+        <a href="https://blogs.nvidia.com/blog/india-ai-mission-nvidia-partnership/" target="_blank"
+          class="article-card" style="border-top:3px solid #FFB84D;" data-glow="rgba(255,184,77,0.12)">
+          <div class="article-meta">
+            <span class="article-cat" style="color:#FFB84D">Market Signal</span>
+            <svg class="score-ring" width="36" height="36" viewBox="0 0 36 36">
+              <circle cx="18" cy="18" r="10" fill="none" stroke="#1E2130" stroke-width="2.5" />
+              <circle cx="18" cy="18" r="10" fill="none" stroke="#34D399" stroke-width="2.5"
+                stroke-dasharray="56.5 62.83" stroke-dashoffset="0" stroke-linecap="round"
+                transform="rotate(-90 18 18)" />
+              <text x="18" y="18" text-anchor="middle" dominant-baseline="central" font-size="9" font-weight="700"
+                fill="#34D399">9</text>
+            </svg>
+          </div>
+          <h4>India Fuels Its AI Mission With NVIDIA</h4>
+          <p class="article-summary">NVIDIA is a key partner in India&#x27;s national AI strategy, the IndiaAI Mission,
+            aiming to accelerate the country&#x27;s AI industrial revolution through collaboration with global leaders.
+          </p>
+          <span class="article-source">NVIDIA AI Blog</span>
+        </a>
+        <a href="https://www.wired.com/story/nvidia-meta-deal-new-era-computing-power/" target="_blank"
+          class="article-card" style="border-top:3px solid #FFB84D;" data-glow="rgba(255,184,77,0.12)">
+          <div class="article-meta">
+            <span class="article-cat" style="color:#FFB84D">Market Signal</span>
+            <svg class="score-ring" width="36" height="36" viewBox="0 0 36 36">
+              <circle cx="18" cy="18" r="10" fill="none" stroke="#1E2130" stroke-width="2.5" />
+              <circle cx="18" cy="18" r="10" fill="none" stroke="#34D399" stroke-width="2.5"
+                stroke-dasharray="50.3 62.83" stroke-dashoffset="0" stroke-linecap="round"
+                transform="rotate(-90 18 18)" />
+              <text x="18" y="18" text-anchor="middle" dominant-baseline="central" font-size="9" font-weight="700"
+                fill="#34D399">8</text>
+            </svg>
+          </div>
+          <h4>NVIDIA’s Deal With Meta Signals a New Era in Computing Power</h4>
+          <p class="article-summary">Nvidia&#x27;s agreement with Meta signifies a shift towards integrated computing
+            power (GPUs and CPUs) rather than discrete chips, reflecting the evolving hardware needs of AI giants.</p>
+          <span class="article-source">Wired AI</span>
+        </a>
+        <a href="https://techcrunch.com/2024/02/20/india-ai-impact-summit-news/" target="_blank" class="article-card"
+          style="border-top:3px solid #FFB84D;" data-glow="rgba(255,184,77,0.12)">
+          <div class="article-meta">
+            <span class="article-cat" style="color:#FFB84D">Market Signal</span>
+            <svg class="score-ring" width="36" height="36" viewBox="0 0 36 36">
+              <circle cx="18" cy="18" r="10" fill="none" stroke="#1E2130" stroke-width="2.5" />
+              <circle cx="18" cy="18" r="10" fill="none" stroke="#34D399" stroke-width="2.5"
+                stroke-dasharray="50.3 62.83" stroke-dashoffset="0" stroke-linecap="round"
+                transform="rotate(-90 18 18)" />
+              <text x="18" y="18" text-anchor="middle" dominant-baseline="central" font-size="9" font-weight="700"
+                fill="#34D399">8</text>
+            </svg>
+          </div>
+          <h4>All the important news from the ongoing India AI Impact Summit</h4>
+          <p class="article-summary">The India AI Impact Summit is drawing major AI labs and heads of state, signaling
+            critical discussions on AI&#x27;s future, market dynamics, and regulation.</p>
+          <span class="article-source">TechCrunch AI</span>
+        </a>
+        <a href="https://www.theverge.com/2024/2/21/24078575/samsung-galaxy-ai-perplexity-integration-bixby-gemini"
+          target="_blank" class="article-card" style="border-top:3px solid #FFB84D;" data-glow="rgba(255,184,77,0.12)">
+          <div class="article-meta">
+            <span class="article-cat" style="color:#FFB84D">Market Signal</span>
+            <svg class="score-ring" width="36" height="36" viewBox="0 0 36 36">
+              <circle cx="18" cy="18" r="10" fill="none" stroke="#1E2130" stroke-width="2.5" />
+              <circle cx="18" cy="18" r="10" fill="none" stroke="#34D399" stroke-width="2.5"
+                stroke-dasharray="50.3 62.83" stroke-dashoffset="0" stroke-linecap="round"
+                transform="rotate(-90 18 18)" />
+              <text x="18" y="18" text-anchor="middle" dominant-baseline="central" font-size="9" font-weight="700"
+                fill="#34D399">8</text>
+            </svg>
+          </div>
+          <h4>Samsung is adding Perplexity to Galaxy AI</h4>
+          <p class="article-summary">Samsung is integrating Perplexity into its Galaxy AI ecosystem, creating a
+            multi-agent environment where users can interact with different AI agents for various tasks.</p>
+          <span class="article-source">The Verge AI</span>
+        </a>
+        <a href="https://techcrunch.com/2024/02/20/a-meta-ai-security-researcher-said-an-openclaw-agent-ran-amok-on-her-inbox/"
+          target="_blank" class="article-card" style="border-top:3px solid #FF6B8A;" data-glow="rgba(255,107,138,0.12)">
+          <div class="article-meta">
+            <span class="article-cat" style="color:#FF6B8A">Risk / Regulation</span>
+            <svg class="score-ring" width="36" height="36" viewBox="0 0 36 36">
+              <circle cx="18" cy="18" r="10" fill="none" stroke="#1E2130" stroke-width="2.5" />
+              <circle cx="18" cy="18" r="10" fill="none" stroke="#34D399" stroke-width="2.5"
+                stroke-dasharray="50.3 62.83" stroke-dashoffset="0" stroke-linecap="round"
+                transform="rotate(-90 18 18)" />
+              <text x="18" y="18" text-anchor="middle" dominant-baseline="central" font-size="9" font-weight="700"
+                fill="#34D399">8</text>
+            </svg>
+          </div>
+          <h4>A Meta AI security researcher said an OpenClaw agent ran amok on her inbox</h4>
+          <p class="article-summary">A Meta AI security researcher reported an &#x27;OpenClaw&#x27; agent causing issues
+            in her inbox, highlighting critical safety concerns with autonomous AI agents.</p>
+          <span class="article-source">TechCrunch AI</span>
+        </a>
+        <a href="https://www.theverge.com/2024/2/21/24077878/ai-security-nightmare-openclaw-lobster-exploit-adnan-khan"
+          target="_blank" class="article-card" style="border-top:3px solid #FF6B8A;" data-glow="rgba(255,107,138,0.12)">
+          <div class="article-meta">
+            <span class="article-cat" style="color:#FF6B8A">Risk / Regulation</span>
+            <svg class="score-ring" width="36" height="36" viewBox="0 0 36 36">
+              <circle cx="18" cy="18" r="10" fill="none" stroke="#1E2130" stroke-width="2.5" />
+              <circle cx="18" cy="18" r="10" fill="none" stroke="#34D399" stroke-width="2.5"
+                stroke-dasharray="50.3 62.83" stroke-dashoffset="0" stroke-linecap="round"
+                transform="rotate(-90 18 18)" />
+              <text x="18" y="18" text-anchor="middle" dominant-baseline="central" font-size="9" font-weight="700"
+                fill="#34D399">8</text>
+            </svg>
+          </div>
+          <h4>The AI security nightmare is here and it looks suspiciously like lobster</h4>
+          <p class="article-summary">A hacker exploited a vulnerability in the open-source AI coding agent Cline to
+            install OpenClaw across systems, demonstrating immediate security risks from autonomous software.</p>
+          <span class="article-source">The Verge AI</span>
+        </a>
+        <a href="https://spectrum.ieee.org/nasa-ai-perseverance-rover" target="_blank" class="article-card"
+          style="border-top:3px solid #06D6A0;" data-glow="rgba(6,214,160,0.12)">
+          <div class="article-meta">
+            <span class="article-cat" style="color:#06D6A0">Research / Technology</span>
+            <svg class="score-ring" width="36" height="36" viewBox="0 0 36 36">
+              <circle cx="18" cy="18" r="10" fill="none" stroke="#1E2130" stroke-width="2.5" />
+              <circle cx="18" cy="18" r="10" fill="none" stroke="#FBBF24" stroke-width="2.5"
+                stroke-dasharray="44.0 62.83" stroke-dashoffset="0" stroke-linecap="round"
+                transform="rotate(-90 18 18)" />
+              <text x="18" y="18" text-anchor="middle" dominant-baseline="central" font-size="9" font-weight="700"
+                fill="#FBBF24">7</text>
+            </svg>
+          </div>
+          <h4>NASA Let AI Drive the Perseverance Rover</h4>
+          <p class="article-summary">NASA&#x27;s Perseverance rover successfully used AI to autonomously generate
+            waypoints and traverse terrain, marking a significant step towards fully autonomous surface rovers.</p>
+          <span class="article-source">IEEE Spectrum AI</span>
+        </a>
+        <a href="https://openai.com/index/advancing-independent-research-on-ai-alignment/" target="_blank"
+          class="article-card" style="border-top:3px solid #06D6A0;" data-glow="rgba(6,214,160,0.12)">
+          <div class="article-meta">
+            <span class="article-cat" style="color:#06D6A0">Research / Technology</span>
+            <svg class="score-ring" width="36" height="36" viewBox="0 0 36 36">
+              <circle cx="18" cy="18" r="10" fill="none" stroke="#1E2130" stroke-width="2.5" />
+              <circle cx="18" cy="18" r="10" fill="none" stroke="#FBBF24" stroke-width="2.5"
+                stroke-dasharray="44.0 62.83" stroke-dashoffset="0" stroke-linecap="round"
+                transform="rotate(-90 18 18)" />
+              <text x="18" y="18" text-anchor="middle" dominant-baseline="central" font-size="9" font-weight="700"
+                fill="#FBBF24">7</text>
+            </svg>
+          </div>
+          <h4>Advancing independent research on AI alignment</h4>
+          <p class="article-summary">OpenAI is committing $7.5 million to The Alignment Project to fund independent
+            research focused on AI safety and security risks associated with advanced AI and AGI.</p>
+          <span class="article-source">OpenAI Blog</span>
+        </a>
+        <a href="https://deepmind.google/discover/blog/gemini-3-1-pro-a-smarter-model-for-your-most-complex-tasks/"
+          target="_blank" class="article-card" style="border-top:3px solid #06D6A0;" data-glow="rgba(6,214,160,0.12)">
+          <div class="article-meta">
+            <span class="article-cat" style="color:#06D6A0">Research / Technology</span>
+            <svg class="score-ring" width="36" height="36" viewBox="0 0 36 36">
+              <circle cx="18" cy="18" r="10" fill="none" stroke="#1E2130" stroke-width="2.5" />
+              <circle cx="18" cy="18" r="10" fill="none" stroke="#FBBF24" stroke-width="2.5"
+                stroke-dasharray="44.0 62.83" stroke-dashoffset="0" stroke-linecap="round"
+                transform="rotate(-90 18 18)" />
+              <text x="18" y="18" text-anchor="middle" dominant-baseline="central" font-size="9" font-weight="700"
+                fill="#FBBF24">7</text>
+            </svg>
+          </div>
+          <h4>Gemini 3.1 Pro: A smarter model for your most complex tasks</h4>
+          <p class="article-summary">Google DeepMind has released Gemini 3.1 Pro, an advanced AI model engineered for
+            handling complex tasks requiring sophisticated applications.</p>
+          <span class="article-source">Google DeepMind</span>
+        </a>
+        <a href="https://www.technologyreview.com/2024/02/21/1090470/microsoft-ai-watermarking-plan-prove-real-fake-online/"
+          target="_blank" class="article-card" style="border-top:3px solid #FF6B8A;" data-glow="rgba(255,107,138,0.12)">
+          <div class="article-meta">
+            <span class="article-cat" style="color:#FF6B8A">Risk / Regulation</span>
+            <svg class="score-ring" width="36" height="36" viewBox="0 0 36 36">
+              <circle cx="18" cy="18" r="10" fill="none" stroke="#1E2130" stroke-width="2.5" />
+              <circle cx="18" cy="18" r="10" fill="none" stroke="#FBBF24" stroke-width="2.5"
+                stroke-dasharray="44.0 62.83" stroke-dashoffset="0" stroke-linecap="round"
+                transform="rotate(-90 18 18)" />
+              <text x="18" y="18" text-anchor="middle" dominant-baseline="central" font-size="9" font-weight="700"
+                fill="#FBBF24">7</text>
+            </svg>
+          </div>
+          <h4>Microsoft has a new plan to prove what’s real and what’s AI online</h4>
+          <p class="article-summary">Microsoft unveiled a blueprint to combat AI-enabled deception online, aiming to
+            help users distinguish between real and AI-generated content.</p>
+          <span class="article-source">MIT Tech Review</span>
+        </a>
+        <a href="https://aws.amazon.com/blogs/ai/build-unified-intelligence-with-amazon-bedrock-agentcore/"
+          target="_blank" class="article-card" style="border-top:3px solid #6C6FFF;" data-glow="rgba(108,111,255,0.12)">
+          <div class="article-meta">
+            <span class="article-cat" style="color:#8B8EFF">Tools / Platforms</span>
+            <svg class="score-ring" width="36" height="36" viewBox="0 0 36 36">
+              <circle cx="18" cy="18" r="10" fill="none" stroke="#1E2130" stroke-width="2.5" />
+              <circle cx="18" cy="18" r="10" fill="none" stroke="#5C6478" stroke-width="2.5"
+                stroke-dasharray="37.7 62.83" stroke-dashoffset="0" stroke-linecap="round"
+                transform="rotate(-90 18 18)" />
+              <text x="18" y="18" text-anchor="middle" dominant-baseline="central" font-size="9" font-weight="700"
+                fill="#5C6478">6</text>
+            </svg>
+          </div>
+          <h4>Build unified intelligence with Amazon Bedrock AgentCore</h4>
+          <p class="article-summary">AWS introduced Bedrock AgentCore to help sales representatives build unified
+            customer intelligence by integrating data from platforms like Salesforce and support tickets.</p>
+          <span class="article-source">AWS AI Blog</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="container">
+      <p><span class="footer-pulse"></span>Powered by AI</p>
+      <p style="margin-top:8px;color:var(--dim);">AI Intelligence Brief // Week 8 // 14 sources</p>
+    </div>
+  </footer>
+
+  <script>
+    // Reading progress bar (optimized with rAF)
+    (function () {
+      var bar = document.getElementById('reading-progress');
+      var ticking = false;
+      window.addEventListener('scroll', function () {
+        if (!ticking) {
+          ticking = true; requestAnimationFrame(function () {
+            var h = document.documentElement.scrollHeight - window.innerHeight;
+            bar.style.width = h > 0 ? ((window.scrollY / h) * 100) + '%' : '0%';
+            ticking = false;
+          });
+        }
+      });
+    })();
+
+    // Scroll reveal with stagger
+    (function () {
+      var reveals = document.querySelectorAll('.reveal');
+      var obs = new IntersectionObserver(function (entries) {
+        entries.forEach(function (e) {
+          if (e.isIntersecting) { e.target.classList.add('visible'); obs.unobserve(e.target); }
+        });
+      }, { threshold: 0.08, rootMargin: '0px 0px -60px 0px' });
+      reveals.forEach(function (el) { obs.observe(el); });
+    })();
+
+    // Progress dots with smooth transitions
+    (function () {
+      var dots = document.querySelectorAll('.progress-dot');
+      var sections = ['hero', 's1', 's2', 's3', 's4', 's5', 'sources'];
+      var obs = new IntersectionObserver(function (entries) {
+        entries.forEach(function (e) {
+          if (e.isIntersecting) {
+            dots.forEach(function (d) { d.classList.remove('active'); });
+            var m = document.querySelector('.progress-dot[href="#' + e.target.id + '"]');
+            if (m) m.classList.add('active');
+          }
+        });
+      }, { threshold: 0.25 });
+      sections.forEach(function (id) {
+        var el = document.getElementById(id);
+        if (el) obs.observe(el);
+      });
+    })();
+
+    // Animated counters with spring easing
+    (function () {
+      var targets = [];
+      document.querySelectorAll('[data-count]').forEach(function (el) {
+        targets.push({ el: el, target: parseFloat(el.getAttribute('data-count')), decimals: parseInt(el.getAttribute('data-decimals') || '0'), done: false });
+      });
+      var obs = new IntersectionObserver(function (entries) {
+        entries.forEach(function (e) {
+          if (!e.isIntersecting) return;
+          var t = targets.find(function (x) { return x.el === e.target; });
+          if (!t || t.done) return;
+          t.done = true;
+          var start = performance.now();
+          var dur = 1800;
+          function tick(now) {
+            var p = Math.min((now - start) / dur, 1);
+            var ease = 1 - Math.pow(1 - p, 4);
+            var v = ease * t.target;
+            t.el.textContent = t.decimals > 0 ? v.toFixed(t.decimals) : Math.round(v);
+            if (p < 1) requestAnimationFrame(tick);
+          }
+          requestAnimationFrame(tick);
+        });
+      }, { threshold: 0.4 });
+      targets.forEach(function (t) { obs.observe(t.el); });
+    })();
+
+    // Article card magnetic hover with glow
+    document.querySelectorAll('.article-card').forEach(function (card) {
+      var glow = card.getAttribute('data-glow') || 'rgba(108,111,255,0.08)';
+      card.addEventListener('mouseenter', function () {
+        card.style.boxShadow = '0 20px 60px ' + glow + ',0 0 0 1px rgba(255,255,255,0.08)';
+      });
+      card.addEventListener('mouseleave', function () {
+        card.style.boxShadow = 'none';
+        card.style.transform = '';
+      });
     });
-  },{threshold:0.25});
-  targets.forEach(function(t){obs.observe(t.el);});
-})();
-</script>
-</body></html>
+
+    // Stat card 3D tilt
+    document.querySelectorAll('.stat-card').forEach(function (card) {
+      card.addEventListener('mousemove', function (e) {
+        var rect = card.getBoundingClientRect();
+        var x = (e.clientX - rect.left) / rect.width - 0.5;
+        var y = (e.clientY - rect.top) / rect.height - 0.5;
+        card.style.transform = 'translateY(-8px) perspective(600px) rotateX(' + (-y * 8) + 'deg) rotateY(' + (x * 8) + 'deg)';
+      });
+      card.addEventListener('mouseleave', function () {
+        card.style.transform = '';
+        card.style.transition = 'all 0.4s cubic-bezier(0.16,1,0.3,1)';
+      });
+      card.addEventListener('mouseenter', function () {
+        card.style.transition = 'transform 0.1s ease-out';
+      });
+    });
+
+    // Particle constellation with mouse interaction
+    (function () {
+      var c = document.getElementById('particle-canvas');
+      if (!c) return;
+      var ctx = c.getContext('2d');
+      var dpr = window.devicePixelRatio || 1;
+      var W, H, particles = [], mouse = { x: -999, y: -999 };
+      function resize() {
+        var cw = c.parentElement.offsetWidth || window.innerWidth;
+        var ch = c.parentElement.offsetHeight || window.innerHeight;
+        c.width = cw * dpr; c.height = ch * dpr;
+        c.style.width = cw + 'px'; c.style.height = ch + 'px';
+        ctx.scale(dpr, dpr);
+        W = cw; H = ch;
+        // Re-distribute particles across full canvas
+        particles.forEach(function (p) { if (p.x > W) p.x = Math.random() * W; if (p.y > H) p.y = Math.random() * H; });
+      }
+      resize();
+      window.addEventListener('resize', function () { ctx.setTransform(1, 0, 0, 1, 0, 0); resize(); });
+      c.addEventListener('mousemove', function (e) { var r = c.getBoundingClientRect(); mouse.x = e.clientX - r.left; mouse.y = e.clientY - r.top; });
+      c.addEventListener('mouseleave', function () { mouse.x = -999; mouse.y = -999; });
+      var colors = [
+        [108, 111, 255], [6, 214, 160], [167, 139, 250], [255, 184, 77]
+      ];
+      for (var i = 0; i < 150; i++) {
+        var ci = colors[Math.floor(Math.random() * colors.length)];
+        particles.push({ x: Math.random() * Math.max(W, 1920), y: Math.random() * Math.max(H, 1080), vx: (Math.random() - 0.5) * 0.35, vy: (Math.random() - 0.5) * 0.35, r: Math.random() * 3 + 1, a: Math.random() * 0.5 + 0.15, c: ci });
+      }
+      function draw() {
+        ctx.clearRect(0, 0, W, H);
+        for (var i = 0; i < particles.length; i++) {
+          var p = particles[i];
+          // Mouse repulsion
+          var dx = p.x - mouse.x, dy = p.y - mouse.y, dm = Math.sqrt(dx * dx + dy * dy);
+          if (dm < 200 && dm > 0) { var f = (200 - dm) / 200 * 1.2; p.x += dx / dm * f; p.y += dy / dm * f; }
+          p.x += p.vx; p.y += p.vy;
+          if (p.x < 0) p.x = W; if (p.x > W) p.x = 0;
+          if (p.y < 0) p.y = H; if (p.y > H) p.y = 0;
+          // Glow effect
+          ctx.beginPath(); ctx.arc(p.x, p.y, p.r * 3, 0, Math.PI * 2);
+          ctx.fillStyle = 'rgba(' + p.c[0] + ',' + p.c[1] + ',' + p.c[2] + ',' + (p.a * 0.15) + ')'; ctx.fill();
+          // Core dot
+          ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+          ctx.fillStyle = 'rgba(' + p.c[0] + ',' + p.c[1] + ',' + p.c[2] + ',' + p.a + ')'; ctx.fill();
+          for (var j = i + 1; j < particles.length; j++) {
+            var q = particles[j];
+            var ddx = p.x - q.x, ddy = p.y - q.y, d = Math.sqrt(ddx * ddx + ddy * ddy);
+            if (d < 200) {
+              var la = 0.12 * (1 - d / 200);
+              ctx.beginPath(); ctx.moveTo(p.x, p.y); ctx.lineTo(q.x, q.y);
+              ctx.strokeStyle = 'rgba(108,111,255,' + la + ')';
+              ctx.lineWidth = 1.2; ctx.stroke();
+            }
+          }
+        }
+        requestAnimationFrame(draw);
+      }
+      draw();
+    })();
+  </script>
+</body>
+
+</html>
