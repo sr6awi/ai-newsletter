@@ -1,0 +1,468 @@
+{
+  "name": "Weekly AI Newsletter Generator",
+  "nodes": [
+    {
+      "id": "a1b2c3d4-1111-4000-a000-000000000001",
+      "name": "Weekly Monday 9AM UTC",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [0, 300],
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 9 * * 1"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "a1b2c3d4-2222-4000-a000-000000000002",
+      "name": "Read Articles from Google Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.2,
+      "position": [260, 300],
+      "parameters": {
+        "operation": "read",
+        "documentId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "={{ $env.GOOGLE_SHEET_ID }}"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "name",
+          "value": "Articles"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "processed",
+              "lookupValue": "false"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "google-sheets-credential-id",
+          "name": "Google Sheets Account"
+        }
+      }
+    },
+    {
+      "id": "a1b2c3d4-3333-4000-a000-000000000003",
+      "name": "Filter Last 7 Days",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [520, 300],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "// Filter articles to only include those from the last 7 days\nconst now = new Date();\nconst sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);\n\nconst filtered = $input.all().filter(item => {\n  const articleDate = new Date(item.json.date);\n  return articleDate >= sevenDaysAgo && articleDate <= now;\n});\n\nif (filtered.length === 0) {\n  throw new Error('No unprocessed articles found in the last 7 days. Workflow stopped.');\n}\n\nreturn filtered;"
+      }
+    },
+    {
+      "id": "a1b2c3d4-4444-4000-a000-000000000004",
+      "name": "Build Gemini Prompt",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [780, 300],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "// Collect all articles and build a single prompt for Gemini batch processing\nconst articles = $input.all().map((item, index) => ({\n  index: index,\n  title: item.json.title || '',\n  url: item.json.url || '',\n  source: item.json.source || '',\n  date: item.json.date || '',\n  description: item.json.description || '',\n  content_snippet: item.json.content_snippet || item.json.content || ''\n}));\n\nconst prompt = `You are an AI newsletter curator. Analyze each article below and return a JSON response.\n\nFor EACH article, provide:\n1. \"relevance_score\": integer from 1 to 10 (10 = extremely relevant to AI/ML professionals)\n2. \"summary\": exactly 2 sentences summarizing the key takeaway\n3. \"category\": exactly one of: \"Research\", \"Product Launch\", \"Industry\", \"Policy\"\n\nScoring guidelines:\n- 9-10: Groundbreaking research, major product launches, significant policy changes\n- 7-8: Notable developments, useful tools, important industry trends\n- 5-6: Incremental updates, minor releases\n- 1-4: Tangential, outdated, or low-quality content\n\nArticles to analyze:\n${JSON.stringify(articles, null, 2)}\n\nRespond ONLY with valid JSON in this exact format, no markdown fences:\n{\n  \"analyzed_articles\": [\n    {\n      \"index\": 0,\n      \"title\": \"...\",\n      \"url\": \"...\",\n      \"source\": \"...\",\n      \"date\": \"...\",\n      \"relevance_score\": 8,\n      \"summary\": \"Two sentence summary here.\",\n      \"category\": \"Research\"\n    }\n  ]\n}`;\n\nreturn [{\n  json: {\n    prompt: prompt,\n    original_articles: articles,\n    article_count: articles.length\n  }\n}];"
+      }
+    },
+    {
+      "id": "a1b2c3d4-5555-4000-a000-000000000005",
+      "name": "Gemini API Request",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1040, 300],
+      "parameters": {
+        "method": "POST",
+        "url": "=https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={{ $env.GEMINI_API_KEY }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"contents\": [\n    {\n      \"parts\": [\n        {\n          \"text\": {{ JSON.stringify($json.prompt) }}\n        }\n      ]\n    }\n  ],\n  \"generationConfig\": {\n    \"temperature\": 0.3,\n    \"topP\": 0.8,\n    \"maxOutputTokens\": 8192,\n    \"responseMimeType\": \"application/json\"\n  }\n}",
+        "options": {
+          "timeout": 60000,
+          "response": {
+            "response": {
+              "fullResponse": true
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "a1b2c3d4-6666-4000-a000-000000000006",
+      "name": "Parse Response and Filter Score 7+",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1300, 300],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "// Parse the Gemini API response and filter articles with score >= 7\nconst responseBody = $input.first().json.body || $input.first().json;\n\nlet geminiText = '';\ntry {\n  // Navigate the Gemini response structure\n  if (responseBody.candidates && responseBody.candidates[0]) {\n    geminiText = responseBody.candidates[0].content.parts[0].text;\n  } else if (responseBody.body && responseBody.body.candidates) {\n    geminiText = responseBody.body.candidates[0].content.parts[0].text;\n  } else {\n    // Try treating the whole response as the text\n    geminiText = typeof responseBody === 'string' ? responseBody : JSON.stringify(responseBody);\n  }\n} catch (e) {\n  throw new Error(`Failed to extract Gemini response text: ${e.message}`);\n}\n\n// Clean the response text: remove markdown code fences if present\nlet cleanedText = geminiText.trim();\nif (cleanedText.startsWith('```json')) {\n  cleanedText = cleanedText.slice(7);\n}\nif (cleanedText.startsWith('```')) {\n  cleanedText = cleanedText.slice(3);\n}\nif (cleanedText.endsWith('```')) {\n  cleanedText = cleanedText.slice(0, -3);\n}\ncleanedText = cleanedText.trim();\n\nlet parsed;\ntry {\n  parsed = JSON.parse(cleanedText);\n} catch (e) {\n  throw new Error(`Failed to parse Gemini JSON response: ${e.message}. Raw text: ${cleanedText.substring(0, 500)}`);\n}\n\nconst articles = parsed.analyzed_articles || parsed.articles || [];\n\n// Filter for relevance score >= 7\nconst highScoring = articles.filter(a => a.relevance_score >= 7);\n\nif (highScoring.length === 0) {\n  throw new Error('No articles scored 7 or above. Newsletter generation skipped this week.');\n}\n\n// Sort by score descending, then by category for grouping\nhighScoring.sort((a, b) => b.relevance_score - a.relevance_score);\n\n// Group articles by category\nconst grouped = {\n  'Research': highScoring.filter(a => a.category === 'Research'),\n  'Product Launch': highScoring.filter(a => a.category === 'Product Launch'),\n  'Industry': highScoring.filter(a => a.category === 'Industry'),\n  'Policy': highScoring.filter(a => a.category === 'Policy')\n};\n\n// Also keep the flat list of all articles for the Google Sheets update step\nconst allOriginalArticles = (parsed.analyzed_articles || parsed.articles || []);\n\nreturn [{\n  json: {\n    grouped_articles: grouped,\n    high_scoring_articles: highScoring,\n    all_analyzed_articles: allOriginalArticles,\n    total_analyzed: articles.length,\n    total_selected: highScoring.length\n  }\n}];"
+      }
+    },
+    {
+      "id": "a1b2c3d4-7777-4000-a000-000000000007",
+      "name": "Generate HTML Email",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1560, 300],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "// Generate a professional HTML newsletter email\nconst data = $input.first().json;\nconst grouped = data.grouped_articles;\nconst totalSelected = data.total_selected;\nconst totalAnalyzed = data.total_analyzed;\n\n// Date range for header\nconst now = new Date();\nconst weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);\nconst formatDate = (d) => d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });\nconst dateRange = `${formatDate(weekAgo)} — ${formatDate(now)}`;\nconst issueDate = formatDate(now);\n\n// Category styling\nconst categoryStyles = {\n  'Research': { color: '#4CAF50', icon: '&#128300;', label: 'Research & Papers' },\n  'Product Launch': { color: '#2196F3', icon: '&#128640;', label: 'Product Launches' },\n  'Industry': { color: '#FF9800', icon: '&#127758;', label: 'Industry News' },\n  'Policy': { color: '#9C27B0', icon: '&#9878;&#65039;', label: 'Policy & Regulation' }\n};\n\n// Build article cards for a category\nfunction buildArticleCards(articles, catColor) {\n  if (!articles || articles.length === 0) return '';\n  \n  return articles.map(article => {\n    const scoreColor = article.relevance_score >= 9 ? '#4CAF50' : article.relevance_score >= 7 ? '#FF9800' : '#999';\n    const articleDate = article.date ? new Date(article.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : '';\n    \n    return `\n            <tr>\n              <td style=\"padding: 0 0 16px 0;\">\n                <table role=\"presentation\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" width=\"100%\" style=\"background-color: #ffffff; border-radius: 8px; overflow: hidden; border: 1px solid #e8e8e8;\">\n                  <tr>\n                    <td style=\"border-left: 4px solid ${catColor}; padding: 20px 24px;\">\n                      <table role=\"presentation\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" width=\"100%\">\n                        <tr>\n                          <td>\n                            <a href=\"${article.url}\" target=\"_blank\" style=\"color: #1a1a2e; text-decoration: none; font-size: 17px; font-weight: 700; line-height: 1.4; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;\">${article.title}</a>\n                          </td>\n                        </tr>\n                        <tr>\n                          <td style=\"padding-top: 10px;\">\n                            <p style=\"margin: 0; color: #444444; font-size: 14px; line-height: 1.6; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;\">${article.summary}</p>\n                          </td>\n                        </tr>\n                        <tr>\n                          <td style=\"padding-top: 14px;\">\n                            <table role=\"presentation\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\">\n                              <tr>\n                                <td style=\"padding-right: 12px;\">\n                                  <span style=\"display: inline-block; background-color: #f0f0f0; color: #555555; font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 12px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; text-transform: uppercase; letter-spacing: 0.5px;\">${article.source || 'Web'}</span>\n                                </td>\n                                <td style=\"padding-right: 12px;\">\n                                  <span style=\"display: inline-block; background-color: ${scoreColor}20; color: ${scoreColor}; font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 12px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;\">Score: ${article.relevance_score}/10</span>\n                                </td>\n                                ${articleDate ? `<td><span style=\"color: #999999; font-size: 12px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;\">${articleDate}</span></td>` : ''}\n                              </tr>\n                            </table>\n                          </td>\n                        </tr>\n                      </table>\n                    </td>\n                  </tr>\n                </table>\n              </td>\n            </tr>`;\n  }).join('\\n');\n}\n\n// Build category sections\nfunction buildCategorySections() {\n  let sections = '';\n  const categoryOrder = ['Research', 'Product Launch', 'Industry', 'Policy'];\n  \n  for (const cat of categoryOrder) {\n    const articles = grouped[cat];\n    if (!articles || articles.length === 0) continue;\n    \n    const style = categoryStyles[cat];\n    sections += `\n          <!-- ${style.label} Section -->\n          <tr>\n            <td style=\"padding: 32px 32px 8px 32px;\">\n              <table role=\"presentation\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" width=\"100%\">\n                <tr>\n                  <td style=\"border-bottom: 3px solid ${style.color}; padding-bottom: 10px;\">\n                    <span style=\"font-size: 20px; font-weight: 800; color: #1a1a2e; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; letter-spacing: -0.3px;\">${style.icon} ${style.label}</span>\n                    <span style=\"float: right; font-size: 13px; color: #999; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; padding-top: 6px;\">${articles.length} article${articles.length !== 1 ? 's' : ''}</span>\n                  </td>\n                </tr>\n              </table>\n            </td>\n          </tr>\n          <tr>\n            <td style=\"padding: 16px 32px 0 32px;\">\n              <table role=\"presentation\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" width=\"100%\">\n                ${buildArticleCards(articles, style.color)}\n              </table>\n            </td>\n          </tr>`;\n  }\n  \n  return sections;\n}\n\nconst htmlContent = `<!DOCTYPE html>\n<html lang=\"en\" xmlns=\"http://www.w3.org/1999/xhtml\" xmlns:o=\"urn:schemas-microsoft-com:office:office\">\n<head>\n  <meta charset=\"utf-8\">\n  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n  <meta http-equiv=\"X-UA-Compatible\" content=\"IE=edge\">\n  <meta name=\"color-scheme\" content=\"light\">\n  <meta name=\"supported-color-schemes\" content=\"light\">\n  <title>AI Weekly Newsletter</title>\n  <!--[if mso]>\n  <noscript>\n    <xml>\n      <o:OfficeDocumentSettings>\n        <o:PixelsPerInch>96</o:PixelsPerInch>\n      </o:OfficeDocumentSettings>\n    </xml>\n  </noscript>\n  <![endif]-->\n  <style>\n    * { margin: 0; padding: 0; }\n    body, table, td, a { -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }\n    table, td { mso-table-lspace: 0pt; mso-table-rspace: 0pt; }\n    img { -ms-interpolation-mode: bicubic; border: 0; height: auto; line-height: 100%; outline: none; text-decoration: none; }\n    body { height: 100% !important; margin: 0 !important; padding: 0 !important; width: 100% !important; background-color: #f4f4f7; }\n    a { color: #2196F3; }\n    a:hover { color: #1976D2; }\n    @media only screen and (max-width: 700px) {\n      .email-container { width: 100% !important; max-width: 100% !important; }\n      .fluid { max-width: 100% !important; height: auto !important; }\n      .stack-column { display: block !important; width: 100% !important; max-width: 100% !important; }\n      .center-on-narrow { text-align: center !important; display: block !important; margin-left: auto !important; margin-right: auto !important; float: none !important; }\n      td[style*=\"padding: 32px\"] { padding: 16px !important; }\n      td[style*=\"padding: 40px\"] { padding: 24px !important; }\n    }\n  </style>\n</head>\n<body style=\"margin: 0; padding: 0; background-color: #f4f4f7;\">\n\n  <!-- Preview text -->\n  <div style=\"display: none; max-height: 0px; overflow: hidden;\">\n    Your weekly AI digest: ${totalSelected} curated articles from ${dateRange}\n  </div>\n  <!-- End preview text -->\n\n  <center style=\"width: 100%; background-color: #f4f4f7; padding: 40px 0;\">\n    <!--[if mso]>\n    <table role=\"presentation\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" width=\"700\" align=\"center\"><tr><td>\n    <![endif]-->\n    <table role=\"presentation\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" width=\"100%\" style=\"max-width: 700px; margin: 0 auto;\" class=\"email-container\">\n\n      <!-- Header -->\n      <tr>\n        <td style=\"background-color: #1a1a2e; padding: 40px 32px; text-align: center; border-radius: 12px 12px 0 0;\">\n          <table role=\"presentation\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" width=\"100%\">\n            <tr>\n              <td style=\"text-align: center;\">\n                <h1 style=\"margin: 0; font-size: 32px; font-weight: 800; color: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; letter-spacing: -0.5px;\">AI Weekly</h1>\n                <p style=\"margin: 8px 0 0 0; font-size: 15px; color: #a0a0b8; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;\">Your curated digest of the most important AI developments</p>\n              </td>\n            </tr>\n            <tr>\n              <td style=\"padding-top: 20px; text-align: center;\">\n                <table role=\"presentation\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" align=\"center\">\n                  <tr>\n                    <td style=\"background-color: rgba(255,255,255,0.1); border-radius: 20px; padding: 8px 20px;\">\n                      <span style=\"color: #c0c0d8; font-size: 13px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-weight: 500;\">${dateRange}</span>\n                    </td>\n                    <td style=\"padding-left: 12px;\">\n                      <span style=\"background-color: rgba(255,255,255,0.1); border-radius: 20px; padding: 8px 20px; color: #c0c0d8; font-size: 13px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-weight: 500;\">${totalSelected} of ${totalAnalyzed} articles selected</span>\n                    </td>\n                  </tr>\n                </table>\n              </td>\n            </tr>\n          </table>\n        </td>\n      </tr>\n\n      <!-- Body -->\n      <tr>\n        <td style=\"background-color: #f8f8fa;\">\n          <table role=\"presentation\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" width=\"100%\">\n            ${buildCategorySections()}\n          </table>\n        </td>\n      </tr>\n\n      <!-- Footer -->\n      <tr>\n        <td style=\"background-color: #f0f0f3; padding: 32px; text-align: center; border-radius: 0 0 12px 12px; border-top: 1px solid #e0e0e0;\">\n          <table role=\"presentation\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" width=\"100%\">\n            <tr>\n              <td style=\"text-align: center; padding-bottom: 16px;\">\n                <p style=\"margin: 0; font-size: 13px; color: #888888; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; line-height: 1.6;\">This newsletter is automatically curated using AI to surface the most relevant developments in artificial intelligence, machine learning, and related fields.</p>\n              </td>\n            </tr>\n            <tr>\n              <td style=\"text-align: center; padding-bottom: 12px;\">\n                <p style=\"margin: 0; font-size: 12px; color: #aaaaaa; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;\">Sent on ${issueDate}</p>\n              </td>\n            </tr>\n            <tr>\n              <td style=\"text-align: center;\">\n                <a href=\"{{UNSUBSCRIBE_URL}}\" style=\"color: #888888; font-size: 12px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; text-decoration: underline;\">Unsubscribe</a>\n                <span style=\"color: #cccccc; font-size: 12px; padding: 0 8px;\">|</span>\n                <a href=\"{{PREFERENCES_URL}}\" style=\"color: #888888; font-size: 12px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; text-decoration: underline;\">Manage Preferences</a>\n              </td>\n            </tr>\n          </table>\n        </td>\n      </tr>\n\n    </table>\n    <!--[if mso]>\n    </td></tr></table>\n    <![endif]-->\n  </center>\n\n</body>\n</html>`;\n\nreturn [{\n  json: {\n    htmlContent: htmlContent,\n    subject: `AI Weekly Digest — ${dateRange}`,\n    totalSelected: totalSelected,\n    totalAnalyzed: totalAnalyzed,\n    dateRange: dateRange,\n    high_scoring_articles: data.high_scoring_articles,\n    all_analyzed_articles: data.all_analyzed_articles\n  }\n}];"
+      }
+    },
+    {
+      "id": "a1b2c3d4-8888-4000-a000-000000000008",
+      "name": "Send Email via Outlook",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [1820, 300],
+      "parameters": {
+        "fromEmail": "={{ $env.OUTLOOK_FROM_EMAIL }}",
+        "toEmail": "={{ $env.OUTLOOK_TO_EMAIL }}",
+        "subject": "={{ $json.subject }}",
+        "emailType": "html",
+        "message": "={{ $json.htmlContent }}",
+        "options": {}
+      },
+      "credentials": {
+        "smtp": {
+          "id": "outlook-smtp-credential-id",
+          "name": "Outlook SMTP"
+        }
+      }
+    },
+    {
+      "id": "a1b2c3d4-9999-4000-a000-000000000009",
+      "name": "Prepare Rows for Update",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [2080, 300],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "// Prepare individual items for Google Sheets update\n// Each analyzed article needs to be marked as processed\nconst data = $input.first().json;\nconst allArticles = data.all_analyzed_articles || [];\n\nif (allArticles.length === 0) {\n  return [{ json: { message: 'No articles to update', skip: true } }];\n}\n\n// Return one item per article so Google Sheets can update each row\nconst items = allArticles.map(article => ({\n  json: {\n    title: article.title,\n    url: article.url,\n    processed: 'true',\n    processed_date: new Date().toISOString(),\n    relevance_score: article.relevance_score,\n    category: article.category,\n    summary: article.summary\n  }\n}));\n\nreturn items;"
+      }
+    },
+    {
+      "id": "a1b2c3d4-aaaa-4000-a000-000000000010",
+      "name": "Mark Articles Processed in Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.2,
+      "position": [2340, 300],
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "={{ $env.GOOGLE_SHEET_ID }}"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "name",
+          "value": "Articles"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "processed": "={{ $json.processed }}",
+            "processed_date": "={{ $json.processed_date }}",
+            "relevance_score": "={{ $json.relevance_score }}",
+            "category": "={{ $json.category }}",
+            "summary": "={{ $json.summary }}"
+          },
+          "matchingColumns": ["url"]
+        },
+        "options": {}
+      },
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "google-sheets-credential-id",
+          "name": "Google Sheets Account"
+        }
+      }
+    },
+    {
+      "id": "a1b2c3d4-bbbb-4000-a000-000000000011",
+      "name": "Prepare Processed Data",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [2080, 600],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "// Prepare high-scoring articles for the Processed archive sheet\nconst data = $input.first().json;\nconst highScoring = data.high_scoring_articles || [];\n\nreturn highScoring.map(article => ({\n  json: {\n    title: article.title,\n    url: article.url,\n    source: article.source || 'Web',\n    summary: article.summary,\n    relevance_score: article.relevance_score,\n    category: article.category,\n    newsletter_date: new Date().toISOString(),\n    date_range: data.dateRange,\n    // Pass summary metadata for the log node\n    _total_analyzed: data.total_analyzed,\n    _total_selected: data.total_selected,\n    _subject: data.subject\n  }\n}));"
+      }
+    },
+    {
+      "id": "a1b2c3d4-cccc-4000-a000-000000000012",
+      "name": "Append to Processed Sheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.2,
+      "position": [2340, 600],
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "={{ $env.GOOGLE_SHEET_ID }}"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "name",
+          "value": "Processed"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "title": "={{ $json.title }}",
+            "url": "={{ $json.url }}",
+            "source": "={{ $json.source }}",
+            "summary": "={{ $json.summary }}",
+            "relevance_score": "={{ $json.relevance_score }}",
+            "category": "={{ $json.category }}",
+            "newsletter_date": "={{ $json.newsletter_date }}",
+            "date_range": "={{ $json.date_range }}"
+          },
+          "matchingColumns": ["url"]
+        },
+        "options": {}
+      },
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "google-sheets-credential-id",
+          "name": "Google Sheets Account"
+        }
+      }
+    },
+    {
+      "id": "a1b2c3d4-dddd-4000-a000-000000000013",
+      "name": "Prepare Newsletter Log Row",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [2600, 600],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "// Aggregate all processed articles into a single newsletter log row\nconst items = $input.all();\nconst first = items[0]?.json || {};\n\nreturn [{\n  json: {\n    send_date: new Date().toISOString(),\n    date_range: first.date_range || '',\n    articles_selected: first._total_selected || items.length,\n    articles_analyzed: first._total_analyzed || 0,\n    subject: first._subject || '',\n    status: 'sent'\n  }\n}];"
+      }
+    },
+    {
+      "id": "a1b2c3d4-eeee-4000-a000-000000000014",
+      "name": "Log Newsletter Send",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.2,
+      "position": [2860, 600],
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "={{ $env.GOOGLE_SHEET_ID }}"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "name",
+          "value": "Newsletter_Log"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "send_date": "={{ $json.send_date }}",
+            "date_range": "={{ $json.date_range }}",
+            "articles_selected": "={{ $json.articles_selected }}",
+            "articles_analyzed": "={{ $json.articles_analyzed }}",
+            "subject": "={{ $json.subject }}",
+            "status": "={{ $json.status }}"
+          },
+          "matchingColumns": []
+        },
+        "options": {}
+      },
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "google-sheets-credential-id",
+          "name": "Google Sheets Account"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Weekly Monday 9AM UTC": {
+      "main": [
+        [
+          {
+            "node": "Read Articles from Google Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read Articles from Google Sheets": {
+      "main": [
+        [
+          {
+            "node": "Filter Last 7 Days",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter Last 7 Days": {
+      "main": [
+        [
+          {
+            "node": "Build Gemini Prompt",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Gemini Prompt": {
+      "main": [
+        [
+          {
+            "node": "Gemini API Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gemini API Request": {
+      "main": [
+        [
+          {
+            "node": "Parse Response and Filter Score 7+",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse Response and Filter Score 7+": {
+      "main": [
+        [
+          {
+            "node": "Generate HTML Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate HTML Email": {
+      "main": [
+        [
+          {
+            "node": "Send Email via Outlook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Email via Outlook": {
+      "main": [
+        [
+          {
+            "node": "Prepare Rows for Update",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Prepare Processed Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Processed Data": {
+      "main": [
+        [
+          {
+            "node": "Append to Processed Sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append to Processed Sheet": {
+      "main": [
+        [
+          {
+            "node": "Prepare Newsletter Log Row",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Newsletter Log Row": {
+      "main": [
+        [
+          {
+            "node": "Log Newsletter Send",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Rows for Update": {
+      "main": [
+        [
+          {
+            "node": "Mark Articles Processed in Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "saveManualExecutions": true,
+    "callerPolicy": "workflowsFromSameOwner",
+    "errorWorkflow": ""
+  },
+  "staticData": null,
+  "tags": [
+    {
+      "name": "newsletter",
+      "id": "tag-newsletter"
+    },
+    {
+      "name": "ai",
+      "id": "tag-ai"
+    },
+    {
+      "name": "automated",
+      "id": "tag-automated"
+    }
+  ],
+  "triggerCount": 1,
+  "active": false,
+  "pinData": {},
+  "versionId": "1"
+}

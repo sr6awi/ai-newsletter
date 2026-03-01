@@ -1,0 +1,717 @@
+{
+  "name": "AI Newsletter - RSS Feed Collection (Every 4 Hours)",
+  "nodes": [
+    {
+      "id": "a1b2c3d4-0001-4000-8000-000000000001",
+      "name": "Cron Trigger (Every 4 Hours)",
+      "type": "n8n-nodes-base.cron",
+      "typeVersion": 1,
+      "position": [0, 1200],
+      "parameters": {
+        "triggerTimes": {
+          "item": [
+            {
+              "mode": "everyX",
+              "value": 4,
+              "unit": "hours"
+            }
+          ]
+        }
+      },
+      "notes": "Triggers the RSS collection workflow every 4 hours. Adjust the interval as needed. If the workflow takes longer than expected, consider increasing the interval or adding execution locking."
+    },
+    {
+      "id": "a1b2c3d4-0002-4000-8000-000000000002",
+      "name": "RSS - Anthropic Blog",
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1,
+      "position": [300, 0],
+      "parameters": {
+        "url": "https://www.anthropic.com/feed.xml"
+      },
+      "notes": "Reads the Anthropic Blog RSS feed. This feed URL is approximated and may need adjustment if Anthropic changes their feed endpoint. Consider adding a retry mechanism or fallback.",
+      "continueOnFail": true
+    },
+    {
+      "id": "a1b2c3d4-0003-4000-8000-000000000003",
+      "name": "RSS - OpenAI Blog",
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1,
+      "position": [300, 200],
+      "parameters": {
+        "url": "https://openai.com/blog/rss.xml"
+      },
+      "notes": "Reads the OpenAI Blog RSS feed. continueOnFail is enabled so that one feed failure does not break the entire workflow.",
+      "continueOnFail": true
+    },
+    {
+      "id": "a1b2c3d4-0004-4000-8000-000000000004",
+      "name": "RSS - Google DeepMind",
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1,
+      "position": [300, 400],
+      "parameters": {
+        "url": "https://deepmind.google/blog/rss.xml"
+      },
+      "notes": "Reads the Google DeepMind Blog RSS feed.",
+      "continueOnFail": true
+    },
+    {
+      "id": "a1b2c3d4-0005-4000-8000-000000000005",
+      "name": "RSS - Hugging Face Blog",
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1,
+      "position": [300, 600],
+      "parameters": {
+        "url": "https://huggingface.co/blog/feed.xml"
+      },
+      "notes": "Reads the Hugging Face Blog RSS feed.",
+      "continueOnFail": true
+    },
+    {
+      "id": "a1b2c3d4-0006-4000-8000-000000000006",
+      "name": "RSS - TechCrunch AI",
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1,
+      "position": [300, 800],
+      "parameters": {
+        "url": "https://techcrunch.com/category/artificial-intelligence/feed/"
+      },
+      "notes": "Reads the TechCrunch AI category RSS feed.",
+      "continueOnFail": true
+    },
+    {
+      "id": "a1b2c3d4-0007-4000-8000-000000000007",
+      "name": "RSS - The Verge AI",
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1,
+      "position": [300, 1000],
+      "parameters": {
+        "url": "https://www.theverge.com/rss/ai-artificial-intelligence/index.xml"
+      },
+      "notes": "Reads The Verge AI RSS feed.",
+      "continueOnFail": true
+    },
+    {
+      "id": "a1b2c3d4-0008-4000-8000-000000000008",
+      "name": "RSS - VentureBeat AI",
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1,
+      "position": [300, 1200],
+      "parameters": {
+        "url": "https://venturebeat.com/category/ai/feed/"
+      },
+      "notes": "Reads the VentureBeat AI category RSS feed.",
+      "continueOnFail": true
+    },
+    {
+      "id": "a1b2c3d4-0009-4000-8000-000000000009",
+      "name": "RSS - Ars Technica",
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1,
+      "position": [300, 1400],
+      "parameters": {
+        "url": "https://feeds.arstechnica.com/arstechnica/technology-lab"
+      },
+      "notes": "Reads the Ars Technica Technology Lab RSS feed (covers AI topics).",
+      "continueOnFail": true
+    },
+    {
+      "id": "a1b2c3d4-0010-4000-8000-000000000010",
+      "name": "RSS - MIT Tech Review",
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1,
+      "position": [300, 1600],
+      "parameters": {
+        "url": "https://www.technologyreview.com/feed/"
+      },
+      "notes": "Reads the MIT Technology Review RSS feed.",
+      "continueOnFail": true
+    },
+    {
+      "id": "a1b2c3d4-0011-4000-8000-000000000011",
+      "name": "RSS - NVIDIA AI Blog",
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1,
+      "position": [300, 1800],
+      "parameters": {
+        "url": "https://blogs.nvidia.com/feed/"
+      },
+      "notes": "Reads the NVIDIA AI Blog RSS feed.",
+      "continueOnFail": true
+    },
+    {
+      "id": "a1b2c3d4-0012-4000-8000-000000000012",
+      "name": "RSS - AWS AI Blog",
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1,
+      "position": [300, 2000],
+      "parameters": {
+        "url": "https://aws.amazon.com/blogs/machine-learning/feed/"
+      },
+      "notes": "Reads the AWS Machine Learning Blog RSS feed.",
+      "continueOnFail": true
+    },
+    {
+      "id": "a1b2c3d4-0013-4000-8000-000000000013",
+      "name": "RSS - IEEE Spectrum AI",
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1,
+      "position": [300, 2200],
+      "parameters": {
+        "url": "https://spectrum.ieee.org/feeds/topic/artificial-intelligence.rss"
+      },
+      "notes": "Reads the IEEE Spectrum AI topic RSS feed.",
+      "continueOnFail": true
+    },
+    {
+      "id": "a1b2c3d4-1001-4000-8000-000000000101",
+      "name": "Merge Pair 1",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 2,
+      "position": [600, 100],
+      "parameters": {
+        "mode": "append"
+      },
+      "notes": "Layer 1: Merges Anthropic Blog + OpenAI Blog"
+    },
+    {
+      "id": "a1b2c3d4-1002-4000-8000-000000000102",
+      "name": "Merge Pair 2",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 2,
+      "position": [600, 500],
+      "parameters": {
+        "mode": "append"
+      },
+      "notes": "Layer 1: Merges Google DeepMind + Hugging Face Blog"
+    },
+    {
+      "id": "a1b2c3d4-1003-4000-8000-000000000103",
+      "name": "Merge Pair 3",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 2,
+      "position": [600, 900],
+      "parameters": {
+        "mode": "append"
+      },
+      "notes": "Layer 1: Merges TechCrunch AI + The Verge AI"
+    },
+    {
+      "id": "a1b2c3d4-1004-4000-8000-000000000104",
+      "name": "Merge Pair 4",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 2,
+      "position": [600, 1300],
+      "parameters": {
+        "mode": "append"
+      },
+      "notes": "Layer 1: Merges VentureBeat AI + Ars Technica"
+    },
+    {
+      "id": "a1b2c3d4-1005-4000-8000-000000000105",
+      "name": "Merge Pair 5",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 2,
+      "position": [600, 1700],
+      "parameters": {
+        "mode": "append"
+      },
+      "notes": "Layer 1: Merges MIT Tech Review + NVIDIA AI Blog"
+    },
+    {
+      "id": "a1b2c3d4-1006-4000-8000-000000000106",
+      "name": "Merge Pair 6",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 2,
+      "position": [600, 2100],
+      "parameters": {
+        "mode": "append"
+      },
+      "notes": "Layer 1: Merges AWS AI Blog + IEEE Spectrum AI"
+    },
+    {
+      "id": "a1b2c3d4-2001-4000-8000-000000000201",
+      "name": "Merge Quad A",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 2,
+      "position": [900, 300],
+      "parameters": {
+        "mode": "append"
+      },
+      "notes": "Layer 2: Merges Pair 1 + Pair 2 (Anthropic, OpenAI, DeepMind, Hugging Face)"
+    },
+    {
+      "id": "a1b2c3d4-2002-4000-8000-000000000202",
+      "name": "Merge Quad B",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 2,
+      "position": [900, 1100],
+      "parameters": {
+        "mode": "append"
+      },
+      "notes": "Layer 2: Merges Pair 3 + Pair 4 (TechCrunch, The Verge, VentureBeat, Ars Technica)"
+    },
+    {
+      "id": "a1b2c3d4-2003-4000-8000-000000000203",
+      "name": "Merge Quad C",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 2,
+      "position": [900, 1900],
+      "parameters": {
+        "mode": "append"
+      },
+      "notes": "Layer 2: Merges Pair 5 + Pair 6 (MIT, NVIDIA, AWS, IEEE)"
+    },
+    {
+      "id": "a1b2c3d4-3001-4000-8000-000000000301",
+      "name": "Merge Half AB",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 2,
+      "position": [1200, 700],
+      "parameters": {
+        "mode": "append"
+      },
+      "notes": "Layer 3: Merges Quad A + Quad B (8 feeds combined)"
+    },
+    {
+      "id": "a1b2c3d4-4001-4000-8000-000000000401",
+      "name": "Merge All Final",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 2,
+      "position": [1500, 1200],
+      "parameters": {
+        "mode": "append"
+      },
+      "notes": "Layer 4 (Final): Merges Half AB + Quad C to produce all 12 feeds in a single stream. Binary merge tree complete: 12 feeds -> 6 pairs -> 3 quads -> 1 half + 1 quad -> 1 final stream."
+    },
+    {
+      "id": "a1b2c3d4-5001-4000-8000-000000000501",
+      "name": "Normalize & Hash Articles",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 1,
+      "position": [1800, 1200],
+      "parameters": {
+        "jsCode": "// Normalize & Hash Articles\n// This Code node processes all merged RSS feed items:\n//   1. Extracts title, url, publication date, and content snippet\n//   2. Strips HTML tags from content\n//   3. Truncates content to 500 characters\n//   4. Computes SHA256 hash of the URL for deduplication\n//   5. Adds metadata fields (category, processed flag, collected_at)\n//\n// Error handling: Items missing a URL are skipped with a warning logged.\n\nconst crypto = require('crypto');\n\nconst results = [];\nconst now = new Date().toISOString();\n\nfor (const item of $input.all()) {\n  try {\n    const data = item.json;\n\n    // Extract URL - RSS feeds use various field names\n    const url = data.link || data.url || data.guid || '';\n    if (!url || url.trim() === '') {\n      console.warn('Skipping item with no URL:', JSON.stringify(data).substring(0, 200));\n      continue;\n    }\n\n    // Extract title\n    const title = (data.title || 'Untitled').trim();\n\n    // Extract and parse publication date\n    let pubDate = data.pubDate || data.isoDate || data.date || data['dc:date'] || now;\n    try {\n      pubDate = new Date(pubDate).toISOString();\n    } catch (e) {\n      pubDate = now;\n    }\n\n    // Extract content and strip HTML\n    let rawContent = data.content || data['content:encoded'] || data.contentSnippet || data.description || data.summary || '';\n    \n    // Strip HTML tags\n    let contentSnippet = rawContent\n      .replace(/<[^>]*>/g, '')\n      .replace(/&nbsp;/g, ' ')\n      .replace(/&amp;/g, '&')\n      .replace(/&lt;/g, '<')\n      .replace(/&gt;/g, '>')\n      .replace(/&quot;/g, '\"')\n      .replace(/&#39;/g, \"'\")\n      .replace(/\\s+/g, ' ')\n      .trim();\n\n    // Truncate to 500 characters\n    if (contentSnippet.length > 500) {\n      contentSnippet = contentSnippet.substring(0, 497) + '...';\n    }\n\n    // Compute SHA256 hash of the URL for deduplication\n    const hash = crypto.createHash('sha256').update(url.trim()).digest('hex');\n\n    results.push({\n      json: {\n        hash: hash,\n        title: title,\n        url: url.trim(),\n        date: pubDate,\n        content_snippet: contentSnippet,\n        category: 'Uncategorized',\n        processed: 'false',\n        collected_at: now\n      }\n    });\n  } catch (err) {\n    console.error('Error processing RSS item:', err.message);\n    // Continue processing other items\n  }\n}\n\n// If no items were processed, return an empty marker to avoid workflow errors\nif (results.length === 0) {\n  return [{ json: { _empty: true, message: 'No new articles found in this run' } }];\n}\n\nreturn results;"
+      },
+      "notes": "PRODUCTION NOTE: This node normalizes all RSS feed items into a consistent schema and computes SHA256 hashes for deduplication. It handles various RSS field naming conventions (link vs url, content vs description, etc.). HTML is stripped from content snippets. Items without URLs are skipped. The crypto module is available in n8n's Code node environment."
+    },
+    {
+      "id": "a1b2c3d4-5002-4000-8000-000000000502",
+      "name": "Check Empty Result",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [2100, 1200],
+      "parameters": {
+        "conditions": {
+          "boolean": [
+            {
+              "value1": "={{ $json._empty }}",
+              "value2": true
+            }
+          ]
+        }
+      },
+      "notes": "Checks if the normalization step returned an empty marker. If true (no articles), the workflow stops gracefully via the warning log branch. If false (articles exist), processing continues to the Google Sheets dedup stage."
+    },
+    {
+      "id": "a1b2c3d4-5003-4000-8000-000000000503",
+      "name": "Google Sheets - Read Existing Hashes",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [2400, 1100],
+      "parameters": {
+        "operation": "getAll",
+        "documentId": {
+          "__rl": true,
+          "mode": "url",
+          "value": "YOUR_GOOGLE_SHEET_URL_HERE"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "name",
+          "value": "Articles"
+        },
+        "returnAll": true,
+        "options": {
+          "range": "A:A"
+        }
+      },
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "REPLACE_WITH_CREDENTIAL_ID",
+          "name": "Google Sheets Account"
+        }
+      },
+      "notes": "SETUP REQUIRED: Replace YOUR_GOOGLE_SHEET_URL_HERE with your actual Google Sheets URL and REPLACE_WITH_CREDENTIAL_ID with your configured Google Sheets OAuth2 credential ID. This node reads all existing hashes from column A of the 'Articles' sheet. The sheet must have a header row with columns: hash, title, url, date, content_snippet, category, processed, collected_at. PERFORMANCE NOTE: For very large sheets (10k+ rows), consider using a database instead of Google Sheets, or read only recent hashes.",
+      "continueOnFail": true
+    },
+    {
+      "id": "a1b2c3d4-5004-4000-8000-000000000504",
+      "name": "Filter Duplicates",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 1,
+      "position": [2700, 1100],
+      "parameters": {
+        "jsCode": "// Filter Duplicates\n// Compares new article hashes against existing hashes from Google Sheets.\n// Only articles with hashes NOT found in the sheet will pass through.\n//\n// This node receives items from two upstream paths that have been merged:\n//   - Normalized articles (with hash, title, url, date, content_snippet, etc.)\n//   - Existing hash rows from Google Sheets (with just a 'hash' field)\n//\n// We differentiate them by checking for the presence of 'title' and 'url'.\n\nconst allItems = $input.all();\n\n// Separate: Sheets items typically have only 'hash' (or 'hash' and row_number),\n// while our normalized articles have 'hash', 'title', 'url', etc.\nconst existingHashes = new Set();\nconst newArticles = [];\n\nfor (const item of allItems) {\n  const data = item.json;\n  \n  // If item has 'title' and 'url' and 'content_snippet', it's a new article\n  if (data.title && data.url && data.content_snippet !== undefined) {\n    newArticles.push(item);\n  } else if (data.hash) {\n    // It's from Google Sheets - just a hash\n    existingHashes.add(data.hash);\n  }\n}\n\n// Filter out duplicates\nconst uniqueArticles = newArticles.filter(item => {\n  return !existingHashes.has(item.json.hash);\n});\n\nconsole.log(`Dedup stats: ${newArticles.length} incoming articles, ${existingHashes.size} existing hashes, ${uniqueArticles.length} new unique articles`);\n\nif (uniqueArticles.length === 0) {\n  return [{ json: { _empty: true, message: 'All articles already exist in the sheet. No new articles to add.' } }];\n}\n\nreturn uniqueArticles;"
+      },
+      "notes": "PRODUCTION NOTE: This node performs the core deduplication logic. It builds a Set of existing hashes from Google Sheets and filters out any articles whose hash is already present. Only genuinely new articles pass through. Logs the dedup statistics for monitoring. If all articles are duplicates, returns an empty marker."
+    },
+    {
+      "id": "a1b2c3d4-5005-4000-8000-000000000505",
+      "name": "Check New Articles Exist",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [3000, 1100],
+      "parameters": {
+        "conditions": {
+          "boolean": [
+            {
+              "value1": "={{ $json._empty }}",
+              "value2": true
+            }
+          ]
+        }
+      },
+      "notes": "Checks if the dedup filter found any new articles. If _empty is true (true branch), all articles were duplicates and the workflow logs and stops. If false (false branch), new articles exist and will be appended to Google Sheets."
+    },
+    {
+      "id": "a1b2c3d4-5006-4000-8000-000000000506",
+      "name": "Google Sheets - Append New Articles",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [3300, 1000],
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "mode": "url",
+          "value": "YOUR_GOOGLE_SHEET_URL_HERE"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "name",
+          "value": "Articles"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "hash": "={{ $json.hash }}",
+            "title": "={{ $json.title }}",
+            "url": "={{ $json.url }}",
+            "date": "={{ $json.date }}",
+            "content_snippet": "={{ $json.content_snippet }}",
+            "category": "={{ $json.category }}",
+            "processed": "={{ $json.processed }}",
+            "collected_at": "={{ $json.collected_at }}"
+          },
+          "matchingColumns": ["hash"]
+        },
+        "options": {}
+      },
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "REPLACE_WITH_CREDENTIAL_ID",
+          "name": "Google Sheets Account"
+        }
+      },
+      "notes": "SETUP REQUIRED: Replace YOUR_GOOGLE_SHEET_URL_HERE and REPLACE_WITH_CREDENTIAL_ID with your actual values. This node appends all new (non-duplicate) articles to the 'Articles' sheet. Columns: hash, title, url, date, content_snippet, category, processed, collected_at. Make sure your Google Sheet has these exact column headers in row 1."
+    },
+    {
+      "id": "a1b2c3d4-5007-4000-8000-000000000507",
+      "name": "Log Results",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 1,
+      "position": [3600, 1000],
+      "parameters": {
+        "jsCode": "// Log Results\n// Summarizes the workflow execution results for monitoring.\n\nconst items = $input.all();\nconst count = items.length;\nconst now = new Date().toISOString();\n\nconsole.log(`[${now}] AI Newsletter Collection Complete: ${count} new articles appended to Google Sheets.`);\n\nreturn [{\n  json: {\n    status: 'success',\n    articles_added: count,\n    completed_at: now,\n    message: `Successfully added ${count} new article(s) to the newsletter collection.`\n  }\n}];"
+      },
+      "notes": "Final logging node. Outputs a summary of how many articles were added. Useful for monitoring workflow health via n8n execution history."
+    },
+    {
+      "id": "a1b2c3d4-5008-4000-8000-000000000508",
+      "name": "No New Articles - Log",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 1,
+      "position": [3300, 1300],
+      "parameters": {
+        "jsCode": "// No New Articles Log\n// This branch executes when all collected articles already exist in Google Sheets.\n\nconst now = new Date().toISOString();\nconsole.log(`[${now}] AI Newsletter Collection: No new articles found. All items already in sheet.`);\n\nreturn [{\n  json: {\n    status: 'no_new_articles',\n    articles_added: 0,\n    completed_at: now,\n    message: 'No new articles to add. All collected items already exist in the sheet.'\n  }\n}];"
+      },
+      "notes": "Logs when no new articles are found. This is a normal outcome if feeds haven't updated since the last run."
+    },
+    {
+      "id": "a1b2c3d4-5009-4000-8000-000000000509",
+      "name": "No Articles Collected - Log",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 1,
+      "position": [2400, 1400],
+      "parameters": {
+        "jsCode": "// No Articles Collected Log\n// This branch executes when the RSS feeds returned no usable articles.\n// This could indicate feed URL changes or network issues.\n\nconst now = new Date().toISOString();\nconsole.log(`[${now}] WARNING: AI Newsletter Collection found 0 articles from all feeds. Check feed URLs and network connectivity.`);\n\nreturn [{\n  json: {\n    status: 'warning_no_articles',\n    articles_added: 0,\n    completed_at: now,\n    message: 'WARNING: No articles collected from any feed. Verify RSS feed URLs are still valid and that the n8n instance has network access.'\n  }\n}];"
+      },
+      "notes": "WARNING PATH: If no articles are collected at all from 12 feeds, something is likely wrong. Check feed URLs, DNS resolution, and outbound HTTP access from the n8n server."
+    }
+  ],
+  "connections": {
+    "Cron Trigger (Every 4 Hours)": {
+      "main": [
+        [
+          { "node": "RSS - Anthropic Blog", "type": "main", "index": 0 },
+          { "node": "RSS - OpenAI Blog", "type": "main", "index": 0 },
+          { "node": "RSS - Google DeepMind", "type": "main", "index": 0 },
+          { "node": "RSS - Hugging Face Blog", "type": "main", "index": 0 },
+          { "node": "RSS - TechCrunch AI", "type": "main", "index": 0 },
+          { "node": "RSS - The Verge AI", "type": "main", "index": 0 },
+          { "node": "RSS - VentureBeat AI", "type": "main", "index": 0 },
+          { "node": "RSS - Ars Technica", "type": "main", "index": 0 },
+          { "node": "RSS - MIT Tech Review", "type": "main", "index": 0 },
+          { "node": "RSS - NVIDIA AI Blog", "type": "main", "index": 0 },
+          { "node": "RSS - AWS AI Blog", "type": "main", "index": 0 },
+          { "node": "RSS - IEEE Spectrum AI", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "RSS - Anthropic Blog": {
+      "main": [
+        [
+          { "node": "Merge Pair 1", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "RSS - OpenAI Blog": {
+      "main": [
+        [
+          { "node": "Merge Pair 1", "type": "main", "index": 1 }
+        ]
+      ]
+    },
+    "RSS - Google DeepMind": {
+      "main": [
+        [
+          { "node": "Merge Pair 2", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "RSS - Hugging Face Blog": {
+      "main": [
+        [
+          { "node": "Merge Pair 2", "type": "main", "index": 1 }
+        ]
+      ]
+    },
+    "RSS - TechCrunch AI": {
+      "main": [
+        [
+          { "node": "Merge Pair 3", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "RSS - The Verge AI": {
+      "main": [
+        [
+          { "node": "Merge Pair 3", "type": "main", "index": 1 }
+        ]
+      ]
+    },
+    "RSS - VentureBeat AI": {
+      "main": [
+        [
+          { "node": "Merge Pair 4", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "RSS - Ars Technica": {
+      "main": [
+        [
+          { "node": "Merge Pair 4", "type": "main", "index": 1 }
+        ]
+      ]
+    },
+    "RSS - MIT Tech Review": {
+      "main": [
+        [
+          { "node": "Merge Pair 5", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "RSS - NVIDIA AI Blog": {
+      "main": [
+        [
+          { "node": "Merge Pair 5", "type": "main", "index": 1 }
+        ]
+      ]
+    },
+    "RSS - AWS AI Blog": {
+      "main": [
+        [
+          { "node": "Merge Pair 6", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "RSS - IEEE Spectrum AI": {
+      "main": [
+        [
+          { "node": "Merge Pair 6", "type": "main", "index": 1 }
+        ]
+      ]
+    },
+    "Merge Pair 1": {
+      "main": [
+        [
+          { "node": "Merge Quad A", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Merge Pair 2": {
+      "main": [
+        [
+          { "node": "Merge Quad A", "type": "main", "index": 1 }
+        ]
+      ]
+    },
+    "Merge Pair 3": {
+      "main": [
+        [
+          { "node": "Merge Quad B", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Merge Pair 4": {
+      "main": [
+        [
+          { "node": "Merge Quad B", "type": "main", "index": 1 }
+        ]
+      ]
+    },
+    "Merge Pair 5": {
+      "main": [
+        [
+          { "node": "Merge Quad C", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Merge Pair 6": {
+      "main": [
+        [
+          { "node": "Merge Quad C", "type": "main", "index": 1 }
+        ]
+      ]
+    },
+    "Merge Quad A": {
+      "main": [
+        [
+          { "node": "Merge Half AB", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Merge Quad B": {
+      "main": [
+        [
+          { "node": "Merge Half AB", "type": "main", "index": 1 }
+        ]
+      ]
+    },
+    "Merge Half AB": {
+      "main": [
+        [
+          { "node": "Merge All Final", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Merge Quad C": {
+      "main": [
+        [
+          { "node": "Merge All Final", "type": "main", "index": 1 }
+        ]
+      ]
+    },
+    "Merge All Final": {
+      "main": [
+        [
+          { "node": "Normalize & Hash Articles", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Normalize & Hash Articles": {
+      "main": [
+        [
+          { "node": "Check Empty Result", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Check Empty Result": {
+      "main": [
+        [
+          { "node": "No Articles Collected - Log", "type": "main", "index": 0 }
+        ],
+        [
+          { "node": "Google Sheets - Read Existing Hashes", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Google Sheets - Read Existing Hashes": {
+      "main": [
+        [
+          { "node": "Filter Duplicates", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Filter Duplicates": {
+      "main": [
+        [
+          { "node": "Check New Articles Exist", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Check New Articles Exist": {
+      "main": [
+        [
+          { "node": "No New Articles - Log", "type": "main", "index": 0 }
+        ],
+        [
+          { "node": "Google Sheets - Append New Articles", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Google Sheets - Append New Articles": {
+      "main": [
+        [
+          { "node": "Log Results", "type": "main", "index": 0 }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "saveManualExecutions": true,
+    "saveDataErrorExecution": "all",
+    "saveDataSuccessExecution": "all",
+    "saveExecutionProgress": true,
+    "callerPolicy": "workflowsFromSameOwner",
+    "errorWorkflow": "",
+    "timezone": "America/New_York",
+    "executionTimeout": 300
+  },
+  "staticData": null,
+  "tags": [
+    {
+      "name": "AI Newsletter",
+      "id": "tag-ai-newsletter-001"
+    },
+    {
+      "name": "RSS Collection",
+      "id": "tag-rss-collection-001"
+    },
+    {
+      "name": "Automated",
+      "id": "tag-automated-001"
+    }
+  ],
+  "triggerCount": 1,
+  "active": false,
+  "pinData": {},
+  "versionId": "1.0.0",
+  "meta": {
+    "instanceId": "ai-newsletter-rss-collector",
+    "templateCredsSetupCompleted": false
+  }
+}

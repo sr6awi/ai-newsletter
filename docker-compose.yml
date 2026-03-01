@@ -1,0 +1,31 @@
+services:
+  n8n:
+    image: n8nio/n8n:latest
+    container_name: ai-newsletter-n8n
+    restart: unless-stopped
+    ports:
+      - "5678:5678"
+    environment:
+      # Core n8n config
+      - N8N_ENCRYPTION_KEY=${N8N_ENCRYPTION_KEY:-a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6}
+      - N8N_HOST=0.0.0.0
+      - N8N_PORT=5678
+      - N8N_PROTOCOL=http
+      - GENERIC_TIMEZONE=UTC
+      - TZ=UTC
+      # Pass through API keys accessible in workflows via $env
+      - GEMINI_API_KEY=${GEMINI_API_KEY:-}
+      - OUTLOOK_FROM_EMAIL=${OUTLOOK_FROM_EMAIL:-}
+      - OUTLOOK_TO_EMAIL=${OUTLOOK_TO_EMAIL:-}
+      - GOOGLE_SHEETS_ID=${GOOGLE_SHEETS_ID:-}
+    volumes:
+      - n8n_data:/home/node/.n8n
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q --spider http://localhost:5678/healthz || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+volumes:
+  n8n_data:
+    driver: local

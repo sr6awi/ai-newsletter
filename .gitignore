@@ -1,0 +1,9 @@
+.env
+service_account.json
+newsletter.db
+venv/
+__pycache__/
+*.pyc
+logs/
+output/
+n8n_data/
