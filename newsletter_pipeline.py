@@ -81,10 +81,9 @@ MAX_ARTICLES_PER_FEED = 15
 
 # Environment variables
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
-BREVO_API_KEY = os.getenv("BREVO_API_KEY", "")
-BREVO_SENDER_EMAIL = os.getenv("BREVO_SENDER_EMAIL", "newsletter@yourdomain.com")
-BREVO_SENDER_NAME = os.getenv("BREVO_SENDER_NAME", "AI Newsletter")
-BREVO_RECIPIENT_EMAILS = os.getenv("BREVO_RECIPIENT_EMAILS", "")
+OUTLOOK_FROM_EMAIL = os.getenv("OUTLOOK_FROM_EMAIL", "")
+OUTLOOK_PASSWORD = os.getenv("OUTLOOK_PASSWORD", "")
+OUTLOOK_TO_EMAIL = os.getenv("OUTLOOK_TO_EMAIL", "")
 STORAGE_BACKEND = os.getenv("STORAGE_BACKEND", "sqlite")
 SQLITE_DB_PATH = os.getenv("SQLITE_DB_PATH", str(Path(__file__).parent / "newsletter.db"))
 
@@ -1367,41 +1366,38 @@ document.querySelectorAll('.stat-card').forEach(function(card){{
 # ---------------------------------------------------------------------------
 
 def send_email(html_content: str) -> bool:
-    if not BREVO_API_KEY:
-        log.error("BREVO_API_KEY is not set")
-        return False
-    if not BREVO_RECIPIENT_EMAILS:
-        log.error("BREVO_RECIPIENT_EMAILS is not set")
-        return False
+    import smtplib
+    from email.mime.multipart import MIMEMultipart
+    from email.mime.text import MIMEText
 
-    recipients = [{"email": e.strip()} for e in BREVO_RECIPIENT_EMAILS.split(",") if e.strip()]
-    if not recipients:
-        log.error("No valid recipient emails")
+    if not OUTLOOK_FROM_EMAIL or not OUTLOOK_PASSWORD:
+        log.error("OUTLOOK_FROM_EMAIL or OUTLOOK_PASSWORD is not set")
+        return False
+    if not OUTLOOK_TO_EMAIL:
+        log.error("OUTLOOK_TO_EMAIL is not set")
         return False
 
     now = datetime.now(timezone.utc)
     wk = (now - datetime(2026, 1, 1, tzinfo=timezone.utc)).days // 7 + 1
     subject = f"AI Intelligence Brief // Week {wk} // {now.strftime('%b %d, %Y')}"
 
-    payload = {
-        "sender": {"name": BREVO_SENDER_NAME, "email": BREVO_SENDER_EMAIL},
-        "to": recipients,
-        "subject": subject,
-        "htmlContent": html_content,
-    }
+    msg = MIMEMultipart("alternative")
+    msg["Subject"] = subject
+    msg["From"] = OUTLOOK_FROM_EMAIL
+    msg["To"] = OUTLOOK_TO_EMAIL
+    msg.attach(MIMEText(html_content, "html"))
 
     try:
-        resp = requests.post(
-            "https://api.brevo.com/v3/smtp/email",
-            json=payload,
-            headers={"api-key": BREVO_API_KEY, "Content-Type": "application/json", "Accept": "application/json"},
-            timeout=30,
-        )
-        resp.raise_for_status()
-        log.info(f"Email sent! Brevo messageId: {resp.json().get('messageId', 'unknown')}")
+        with smtplib.SMTP("smtp.office365.com", 587, timeout=30) as server:
+            server.ehlo()
+            server.starttls()
+            server.ehlo()
+            server.login(OUTLOOK_FROM_EMAIL, OUTLOOK_PASSWORD)
+            server.sendmail(OUTLOOK_FROM_EMAIL, OUTLOOK_TO_EMAIL.split(","), msg.as_string())
+        log.info(f"Email sent via Outlook SMTP to {OUTLOOK_TO_EMAIL}")
         return True
-    except requests.exceptions.HTTPError as e:
-        log.error(f"Brevo error: {e} — {e.response.text[:300]}")
+    except smtplib.SMTPAuthenticationError as e:
+        log.error(f"Outlook auth failed: {e}")
         return False
     except Exception as e:
         log.error(f"Send failed: {e}")
